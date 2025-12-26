@@ -2,21 +2,22 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Refit;
 using Sample.Common;
 
-namespace ClientHostSample
+namespace RefitSample
 {
     internal class Program
     {
         static async Task Main(string[] args)
         {
             var host1 = CreateHmacAuthenticationHost(new Uri("https://localhost:5001/"));
-            var apiClient1 = host1.Services.GetRequiredService<ApiClient>();
+            var apiClient1 = host1.Services.GetRequiredService<IApiClient>();
             await ApiInvoke(apiClient1);
 
-            var host2 = CreateHawkAuthenticationHost(new Uri("https://localhost:5001/"));
-            var apiClient2 = host2.Services.GetRequiredService<ApiClient>();
-            await ApiInvoke(apiClient2);
+            //var host2 = CreateHawkAuthenticationHost(new Uri("https://localhost:5001/"));
+            //var apiClient2 = host2.Services.GetRequiredService<IApiClient>();
+            //await ApiInvoke(apiClient2);
 
             Console.ReadKey();
         }
@@ -24,6 +25,7 @@ namespace ClientHostSample
         static IHost CreateHmacAuthenticationHost(Uri serverAddress)
         {
             return new HostBuilder()
+                //.UseDefaultServiceProvider(options => options.ValidateScopes = true)
                 .ConfigureServices(services =>
                 {
                     services.Configure<HmacSettings>(options =>
@@ -33,7 +35,7 @@ namespace ClientHostSample
                     });
                     services.AddSingleton<IValidateOptions<HmacSettings>, HmacSettingsValidation>();
                     services.AddTransient<HmacDelegatingHandler>();
-                    services.AddHttpClient<ApiClient>("ApiClient", httpClient =>
+                    services.AddRefitClient<IApiClient>().ConfigureHttpClient(httpClient =>
                     {
                         httpClient.BaseAddress = serverAddress;
                         httpClient.DefaultRequestVersion = new Version(2, 0);
@@ -46,6 +48,7 @@ namespace ClientHostSample
         static IHost CreateHawkAuthenticationHost(Uri serverAddress)
         {
             return new HostBuilder()
+                .UseDefaultServiceProvider(options => options.ValidateScopes = true)
                 .ConfigureServices(services =>
                 {
                     services.Configure<HawkSettings>(options =>
@@ -59,17 +62,13 @@ namespace ClientHostSample
                     });
                     services.AddSingleton<IValidateOptions<HawkSettings>, HawkSettingsValidation>();
                     services.AddTransient<HawkDelegatingHandler>();
-                    services.AddHttpClient<ApiClient>("ApiClient", httpClient =>
-                    {
-                        httpClient.BaseAddress = serverAddress;
-                        httpClient.DefaultRequestVersion = new Version(2, 0);
-                    })
+                    services.AddRefitClient<IApiClient>().ConfigureHttpClient(httpClient => httpClient.BaseAddress = serverAddress)
                     .AddHttpMessageHandler<HawkDelegatingHandler>();
                 })
                 .Build();
         }
 
-        static async Task ApiInvoke(ApiClient apiClient)
+        static async Task ApiInvoke(IApiClient apiClient)
         {
             await apiClient.CreateTodoItemAsync(new TodoItem { Name = "walk dog", IsComplete = true });
             await apiClient.UpdateTodoItemAsync(new TodoItem { Id = 1, Name = "feed fish", IsComplete = true });

@@ -1,8 +1,8 @@
-# Alastack Authentication HmacAuth
+# Alastack HmacAuth
 
 A .NET API supports Hmac and [Hawk](https://github.com/mozilla/hawk) authentication.
 
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kyzala/AlastackAuthenticationHmacAuth/dotnet.yml?branch=main)](https://github.com/kyzala/AlastackAuthenticationHmacAuth/actions/workflows/dotnet.yml)[![GitHub](https://img.shields.io/github/license/kyzala/AlastackAuthenticationHmacAuth)](LICENSE)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kyzala/AlastackHmacAuth/dotnet.yml?branch=main)](https://github.com/kyzala/AlastackHmacAuth/actions/workflows/dotnet.yml)[![GitHub](https://img.shields.io/github/license/kyzala/AlastackHmacAuth)](LICENSE)
 
 ## Getting started
 
@@ -11,13 +11,13 @@ A .NET API supports Hmac and [Hawk](https://github.com/mozilla/hawk) authenticat
 Client：
 
 ```
-dotnet add package Alastack.Authentication.HmacAuth
+dotnet add package Alastack.HmacAuth
 ```
 
 AspNetCore：
 
 ```
-dotnet add package Alastack.Authentication.HmacAuth.AspNetCore
+dotnet add package Alastack.HmacAuth.AspNetCore
 ```
 
 ### Hmac Authentication
@@ -144,12 +144,12 @@ This repo builds the following packages.
 
 | Package                                 | Version                                                      | Description                                                  |
 | --------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Alastack.Authentication.HmacAuth | [![Nuget](https://img.shields.io/nuget/v/Alastack.Authentication.HmacAuth)](https://www.nuget.org/packages/Alastack.Authentication.HmacAuth) | Hmac and Hawk authentication client.|
-| Alastack.Authentication.HmacAuth.AspNetCore | [![Nuget](https://img.shields.io/nuget/v/Alastack.Authentication.HmacAuth.AspNetCore)](https://www.nuget.org/packages/Alastack.Authentication.HmacAuth.AspNetCore) | Hmac and Hawk authentication for ASP.NET Core.|
-| Alastack.Authentication.HmacAuth.Sql             | [![Nuget](https://img.shields.io/nuget/v/Alastack.Authentication.HmacAuth.Sql)](https://www.nuget.org/packages/Alastack.Authentication.HmacAuth.Sql) | Sql CredentialProvider.                   |
-| Alastack.Authentication.HmacAuth.MongoDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.Authentication.HmacAuth.MongoDB)](https://www.nuget.org/packages/Alastack.Authentication.HmacAuth.MongoDB) | MongoDB CredentialProvider.                   |
-| Alastack.Authentication.HmacAuth.EntityFrameworkCore             | [![Nuget](https://img.shields.io/nuget/v/Alastack.Authentication.HmacAuth.EntityFrameworkCore)](https://www.nuget.org/packages/Alastack.Authentication.HmacAuth.EntityFrameworkCore) | EntityFrameworkCore CredentialProvider.                   |
-| Alastack.Authentication.HmacAuth.LiteDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.Authentication.HmacAuth.LiteDB)](https://www.nuget.org/packages/Alastack.Authentication.HmacAuth.LiteDB) | LiteDB CredentialProvider.                   |
+| Alastack.HmacAuth | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth)](https://www.nuget.org/packages/Alastack.HmacAuth) | Hmac and Hawk authentication client.|
+| Alastack.HmacAuth.AspNetCore | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.AspNetCore)](https://www.nuget.org/packages/Alastack.HmacAuth.AspNetCore) | Hmac and Hawk authentication for ASP.NET Core.|
+| Alastack.HmacAuth.Sql             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.Sql)](https://www.nuget.org/packages/Alastack.HmacAuth.Sql) | Sql CredentialProvider.                   |
+| Alastack.HmacAuth.MongoDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.MongoDB)](https://www.nuget.org/packages/Alastack.HmacAuth.MongoDB) | MongoDB CredentialProvider.                   |
+| Alastack.HmacAuth.EntityFrameworkCore             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.EntityFrameworkCore)](https://www.nuget.org/packages/Alastack.HmacAuth.EntityFrameworkCore) | EntityFrameworkCore CredentialProvider.                   |
+| Alastack.HmacAuth.LiteDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.LiteDB)](https://www.nuget.org/packages/Alastack.HmacAuth.LiteDB) | LiteDB CredentialProvider.                   |
 
 ## Configure Authentication
 
@@ -212,4 +212,4 @@ A data cache abstraction. `DataCache` integrates in-memory and distributing cach
 
 ## Samples
 
-Visit the [samples](https://github.com/kyzala/AlastackAuthenticationHmacAuth/tree/main/samples) folder.
+Visit the [samples](https://github.com/kyzala/AlastackHmacAuth/tree/main/samples) folder.

@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-	<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+	<TargetFrameworks>net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
@@ -9,8 +9,8 @@
 	<Copyright>Copyright © 2023 kyzala</Copyright>
 	<PackageIcon>icon.png</PackageIcon>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageProjectUrl>https://github.com/kyzala/AlastackAuthenticationHmacAuth</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/kyzala/AlastackAuthenticationHmacAuth</RepositoryUrl>
+	<PackageProjectUrl>https://github.com/kyzala/AlastackHmacAuth</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/kyzala/AlastackHmacAuth</RepositoryUrl>
 	<RespositoryType>git</RespositoryType>
 	<IncludeSymbols>true</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>

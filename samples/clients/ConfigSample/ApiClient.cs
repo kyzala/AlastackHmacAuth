@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace ClientHostSample
+namespace ConfigSample
 {
     public sealed class ApiClient
     {
