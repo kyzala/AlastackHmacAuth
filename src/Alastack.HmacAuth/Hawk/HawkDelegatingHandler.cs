@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Headers;
 
 namespace Alastack.HmacAuth;
@@ -9,42 +8,45 @@ namespace Alastack.HmacAuth;
 /// </summary>
 public class HawkDelegatingHandler : DelegatingHandler
 {
-    private readonly IOptionsMonitor<HawkSettings>? _optionsMonitor;
     private readonly HawkSettings? _hawkSettings;
 
     /// <summary>
-    /// Hawk authentication settings.
+    /// Gets the Hawk authentication settings
     /// </summary>
-    public HawkSettings Settings { get => _optionsMonitor?.CurrentValue ?? _hawkSettings!; }
+    public virtual HawkSettings Settings  => _hawkSettings!;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="HawkDelegatingHandler"/>.
+    /// Initializes a new instance of the <see cref="HawkDelegatingHandler"/> class
     /// </summary>
-    /// <param name="authId">The authentication Id.</param>
-    /// <param name="authKey">The authentication key.</param>
+    protected HawkDelegatingHandler() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HawkDelegatingHandler"/> class
+    /// </summary>
+    /// <param name="authId">The authentication identifier (client ID)</param>
+    /// <param name="authKey">The authentication key (shared secret)</param>
     public HawkDelegatingHandler(string authId, string authKey) : this (new HawkSettings { AuthId = authId, AuthKey = authKey })
     {            
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="HawkDelegatingHandler"/>.
+    /// Initializes a new instance of the <see cref="HawkDelegatingHandler"/> class
+    /// with Hawk settings
     /// </summary>
-    /// <param name="hawkSettings">The <see cref="HawkSettings"/>.</param>
+    /// <param name="hawkSettings">The Hawk authentication settings</param>
     public HawkDelegatingHandler(HawkSettings hawkSettings)
     {
         _hawkSettings = hawkSettings;
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="HawkDelegatingHandler"/>.
+    /// Sends an HTTP request to the inner handler to send to the server as an asynchronous operation
     /// </summary>
-    /// <param name="optionsMonitor">Used for notifications when <see cref="HawkSettings"/> instances change.</param>
-    public HawkDelegatingHandler(IOptionsMonitor<HawkSettings> optionsMonitor)
-    {
-        _optionsMonitor = optionsMonitor;
-    }
-
-    /// <inheritdoc />
+    /// <param name="request">The HTTP request message to send to the server</param>
+    /// <param name="cancellationToken">A cancellation token to cancel operation</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation
+    /// </returns>
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var authHeader = await CreateAuthenticationHeaderAsync(request, cancellationToken);
@@ -61,7 +63,7 @@ public class HawkDelegatingHandler : DelegatingHandler
 
         if (Settings.EnableServerAuthorizationValidation)
         {
-            await HandleServerAuthenticateAsync(response, (HawkRawData)authHeader.Properties["HawkRawData"], cancellationToken);
+            await HandleServerAuthenticateAsync(response, (HawkData)authHeader.Properties["HawkData"], cancellationToken);
         }
         if (Settings.EnableServerTimeValidation)
         {
@@ -71,11 +73,13 @@ public class HawkDelegatingHandler : DelegatingHandler
     }
 
     /// <summary>
-    /// Creating an authentication Header.
+    /// Creates an authentication header for the HTTP request
     /// </summary>
-    /// <param name="request">The HTTP request message to send to the server.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel operation.</param>
-    /// <returns>The task object representing the asynchronous operation.</returns>
+    /// <param name="request">The HTTP request message to send to the server</param>
+    /// <param name="cancellationToken">A cancellation token to cancel operation</param>
+    /// <returns>
+    /// An <see cref="AuthenticationHeader"/> containing the Hawk authentication information
+    /// </returns>
     /// <exception cref="NullReferenceException">If the request uri is <c>null</c>, an exception will be thrown.</exception>
     protected virtual async Task<AuthenticationHeader> CreateAuthenticationHeaderAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
@@ -95,7 +99,7 @@ public class HawkDelegatingHandler : DelegatingHandler
         var timestamp = Settings.TimestampCalculator.Calculate(Settings.TimeOffset);
         var nonce = Settings.NonceGenerator.Generate(Settings.AuthId);
 
-        var hawkRawData = new HawkRawData
+        var hawkData = new HawkData
         {
             Timestamp = timestamp,
             Nonce = nonce,
@@ -109,7 +113,7 @@ public class HawkDelegatingHandler : DelegatingHandler
             Dlg = Settings.Dlg
         };
 
-        var mac = crypto.CalculateRequestMac(hawkRawData);
+        var mac = crypto.CalculateRequestMac(hawkData);
         var authVal = new HawkParameters
         {
             Scheme = HawkDefaults.AuthenticationScheme,
@@ -118,20 +122,27 @@ public class HawkDelegatingHandler : DelegatingHandler
             Nonce = nonce,
             Mac = mac,
             Hash = payloadHash,
-            Ext = hawkRawData.Ext,
-            App = hawkRawData.App,
-            Dlg = hawkRawData.Dlg
+            Ext = hawkData.Ext,
+            App = hawkData.App,
+            Dlg = hawkData.Dlg
         };
         var header = new AuthenticationHeader
         {
             Scheme = authVal.Scheme,
             Parameter = authVal.Parameter
         };
-        header.Properties["HawkRawData"] = hawkRawData;
+        header.Properties["HawkData"] = hawkData;
         return header;
     }
 
-    protected virtual async Task HandleServerAuthenticateAsync(HttpResponseMessage response, HawkRawData hawkRawData, CancellationToken cancellationToken)
+    /// <summary>
+    /// Validates the server's authentication response
+    /// </summary>
+    /// <param name="response">The HTTP response received from the server</param>
+    /// <param name="hawkData">The Hawk authentication data used in the original request</param>
+    /// <param name="cancellationToken">A cancellation token to cancel operation</param>
+    /// <returns>A task representing the asynchronous validation operation</returns>
+    protected virtual async Task HandleServerAuthenticateAsync(HttpResponseMessage response, HawkData hawkData, CancellationToken cancellationToken)
     {
         if (!response.IsSuccessStatusCode)
         {
@@ -160,21 +171,21 @@ public class HawkDelegatingHandler : DelegatingHandler
         saParams.TryGetValue("hash", out var hash);
         saParams.TryGetValue("ext", out var ext);
 
-        hawkRawData.Hash = hash;
-        hawkRawData.Ext = ext;
+        hawkData.Hash = hash;
+        hawkData.Ext = ext;
 
         var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
-        var macNew = crypto.CalculateResponseMac(hawkRawData);
+        var macNew = crypto.CalculateResponseMac(hawkData);
         if (!mac.Equals(macNew, StringComparison.Ordinal))
         {
             response.StatusCode = HttpStatusCode.Unauthorized;
             return;
         }
-        if (hawkRawData.Hash != null)
+        if (hawkData.Hash != null)
         {
             var payload = await response.Content.ReadAsStringAsync(cancellationToken);
             var payloadHash = crypto.CalculatePayloadHash(payload, response.Content.Headers.ContentType?.MediaType);
-            if (!hawkRawData.Hash.Equals(payloadHash, StringComparison.Ordinal))
+            if (!hawkData.Hash.Equals(payloadHash, StringComparison.Ordinal))
             {
                 response.StatusCode = HttpStatusCode.Unauthorized;
                 return;
@@ -182,6 +193,12 @@ public class HawkDelegatingHandler : DelegatingHandler
         }
     }
 
+    /// <summary>
+    /// Validates server timestamp when authentication fails
+    /// </summary>
+    /// <param name="response">The HTTP response received from the server</param>
+    /// <param name="cancellationToken">A cancellation token to cancel operation</param>
+    /// <returns>A task representing the asynchronous validation operation</returns>
     protected virtual async Task HandleServerTimeValidateAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         if (response.StatusCode != HttpStatusCode.Unauthorized)

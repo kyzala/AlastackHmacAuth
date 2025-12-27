@@ -1,9 +1,22 @@
-﻿namespace Sample.Common
+﻿namespace Sample.Common;
+
+/// <summary>
+/// TodoItemDTO
+/// </summary>
+public class TodoItemDTO
 {
-    public class TodoItemDTO
-    {
-        public long Id { get; set; }
-        public string? Name { get; set; }
-        public bool IsComplete { get; set; }
-    }
+    /// <summary>
+    /// Id
+    /// </summary>
+    public long Id { get; set; }
+
+    /// <summary>
+    /// Name
+    /// </summary>
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// IsComplete
+    /// </summary>
+    public bool IsComplete { get; set; }
 }

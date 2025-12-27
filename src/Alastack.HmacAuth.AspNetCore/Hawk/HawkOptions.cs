@@ -92,7 +92,7 @@ public class HawkOptions : AuthenticationSchemeOptions
     /// <summary>
     /// <see cref="ICredentialCache{TCredential}"/> interface.
     /// </summary>
-    public ICredentialCache<HawkCredential> CredentialCache { get; set; }
+    public ICredentialCache<HawkCredential> CredentialCache { get; set; } = default!;
 
     /// <summary>
     /// The Provider may be assigned to an instance of an object created by the application at startup time. The handler

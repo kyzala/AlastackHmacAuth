@@ -49,9 +49,9 @@ public class HawkCryptoTests
         Assert.Equal(expected, actual);
     }
 
-    private static HawkRawData CreateMacParameters(long timestamp, string nonce, string method, string resource, string host, int port, string? hash, string? ext, string? app, string? dlg)
+    private static HawkData CreateMacParameters(long timestamp, string nonce, string method, string resource, string host, int port, string? hash, string? ext, string? app, string? dlg)
     {
-        return new HawkRawData
+        return new HawkData
         {
             Timestamp = timestamp,
             Nonce = nonce,

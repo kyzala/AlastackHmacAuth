@@ -53,12 +53,12 @@ public class HawkMiddleware
 
     private async Task AddServerAuthorizationAsync(HttpContext context, HawkOptions options)
     {
-        if (!context.Items.TryGetValue("hawk:credential", out var val1) || !context.Items.TryGetValue("hawk:hawkRawData", out var val2))
+        if (!context.Items.TryGetValue("hawk:credential", out var val1) || !context.Items.TryGetValue("hawk:hawkData", out var val2))
         {
             return;
         }
         var credential = (HawkCredential)val1!;
-        var macParameters = (HawkRawData)val2!;
+        var macParameters = (HawkData)val2!;
         macParameters.Hash = null;
         macParameters.Ext = null;
         var crypto = options.CryptoFactory.Create(credential.HmacAlgorithm, credential.HashAlgorithm, credential.AuthKey);

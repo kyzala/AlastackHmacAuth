@@ -31,7 +31,7 @@ namespace ClientHostSample
                         options.AppId = "id123";
                         options.AppKey = "3@uo45er?";
                     });
-                    services.AddSingleton<IValidateOptions<HmacSettings>, HmacSettingsValidation>();
+                    services.AddSingleton<IValidateOptions<HmacSettings>, Sample.Common.HmacConfigValidation>();
                     services.AddTransient<HmacDelegatingHandler>();
                     services.AddHttpClient<ApiClient>("ApiClient", httpClient =>
                     {
@@ -57,7 +57,7 @@ namespace ClientHostSample
                         options.EnableServerAuthorizationValidation = true;
                         options.GetSpecificData = async (request, options) => await Task.FromResult("some-data");
                     });
-                    services.AddSingleton<IValidateOptions<HawkSettings>, HawkSettingsValidation>();
+                    services.AddSingleton<IValidateOptions<HawkSettings>, Sample.Common.HawkConfigValidation>();
                     services.AddTransient<HawkDelegatingHandler>();
                     services.AddHttpClient<ApiClient>("ApiClient", httpClient =>
                     {

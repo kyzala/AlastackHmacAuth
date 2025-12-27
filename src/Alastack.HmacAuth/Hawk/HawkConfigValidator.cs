@@ -1,19 +1,12 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace Alastack.HmacAuth;
+﻿namespace Alastack.HmacAuth;
 
 /// <summary>
 /// Class used to validate <see cref="HawkSettings" /> instance.
 /// </summary>
-public class HawkSettingsValidation : IValidateOptions<HawkSettings>
+public class HawkConfigValidator : IConfigValidator<HawkSettings>
 {
-    /// <summary>
-    /// Validates a specific named options instance (or all when name is null).
-    /// </summary>
-    /// <param name="name">The name of the options instance being validated.</param>
-    /// <param name="options">The options instance.</param>
-    /// <returns>The <see cref="ValidateOptionsResult" /> result.</returns>
-    public ValidateOptionsResult Validate(string? name, HawkSettings options)
+    /// <inheritdoc />
+    public ValidateConfigResult Validate(HawkSettings options)
     {
         string? vor = null;
         if (String.IsNullOrWhiteSpace(options.AuthId))
@@ -35,9 +28,9 @@ public class HawkSettingsValidation : IValidateOptions<HawkSettings>
 
         if (vor != null)
         {
-            return ValidateOptionsResult.Fail(vor);
+            return ValidateConfigResult.Fail(vor);
         }
 
-        return ValidateOptionsResult.Success;
+        return ValidateConfigResult.Success;
     }
 }

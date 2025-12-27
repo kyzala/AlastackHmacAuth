@@ -1,19 +1,12 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace Alastack.HmacAuth;
+﻿namespace Alastack.HmacAuth;
 
 /// <summary>
 /// Class used to validate <see cref="HmacSettings" /> instance.
 /// </summary>
-public class HmacSettingsValidation : IValidateOptions<HmacSettings>
+public class HmacConfigValidator : IConfigValidator<HmacSettings>
 {
-    /// <summary>
-    /// Validates a specific named options instance (or all when name is null).
-    /// </summary>
-    /// <param name="name">The name of the options instance being validated.</param>
-    /// <param name="options">The options instance.</param>
-    /// <returns>The <see cref="ValidateOptionsResult" /> result.</returns>
-    public ValidateOptionsResult Validate(string? name, HmacSettings options)
+    /// <inheritdoc />
+    public ValidateConfigResult Validate(HmacSettings options)
     {
         string? vor = null;
         if (String.IsNullOrWhiteSpace(options.AppId))
@@ -35,9 +28,9 @@ public class HmacSettingsValidation : IValidateOptions<HmacSettings>
 
         if (vor != null)
         {
-            return ValidateOptionsResult.Fail(vor);
+            return ValidateConfigResult.Fail(vor);
         }
 
-        return ValidateOptionsResult.Success;
+        return ValidateConfigResult.Success;
     }
 }

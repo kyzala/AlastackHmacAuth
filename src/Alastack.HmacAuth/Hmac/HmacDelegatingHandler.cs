@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 
 namespace Alastack.HmacAuth;
 
@@ -8,13 +7,17 @@ namespace Alastack.HmacAuth;
 /// </summary>
 public class HmacDelegatingHandler : DelegatingHandler
 {
-    private readonly IOptionsMonitor<HmacSettings>? _optionsMonitor;
     private readonly HmacSettings? _hmacSettings;
 
     /// <summary>
     /// Hmac authentication settings.
     /// </summary>
-    public HmacSettings Settings { get => _optionsMonitor?.CurrentValue ?? _hmacSettings!; }
+    public virtual HmacSettings Settings => _hmacSettings!;
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
+    /// </summary>
+    protected HmacDelegatingHandler() { }
 
     /// <summary>
     /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
@@ -32,15 +35,6 @@ public class HmacDelegatingHandler : DelegatingHandler
     public HmacDelegatingHandler(HmacSettings hmacSettings)
     {
         _hmacSettings = hmacSettings;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
-    /// </summary>
-    /// <param name="optionsMonitor">Used for notifications when <see cref="HmacSettings"/> instances change.</param>
-    public HmacDelegatingHandler(IOptionsMonitor<HmacSettings> optionsMonitor)
-    {
-        _optionsMonitor = optionsMonitor;
     }
 
     /// <inheritdoc />
@@ -84,8 +78,8 @@ public class HmacDelegatingHandler : DelegatingHandler
         var nonce = Settings.NonceGenerator.Generate(Settings.AppId);
 
         // {appId}\n{timestamp}\n{nonce}\n{method}\n{resource}\n{host}\n{port}\n{payloadHash}
-        var rawData = $"{Settings.AppId}\n{timestamp}\n{nonce}\n{request.Method.Method}\n{request.RequestUri.PathAndQuery}\n{request.RequestUri.Host}\n{request.RequestUri.Port}\n{payloadHash}";
-        var signature = crypto.CalculateMac(rawData);
+        var hmacData = $"{Settings.AppId}\n{timestamp}\n{nonce}\n{request.Method.Method}\n{request.RequestUri.PathAndQuery}\n{request.RequestUri.Host}\n{request.RequestUri.Port}\n{payloadHash}";
+        var signature = crypto.CalculateMac(hmacData);
         var parameter = $"{Settings.AppId}:{timestamp}:{nonce}:{signature}:{payloadHash}";
 
         return new AuthenticationHeader

@@ -9,7 +9,7 @@ using System.Text.Encodings.Web;
 namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
-/// Authentication handler for Hawk authentication.
+/// Authentication handler for Hawk authentication in ASP.NET Core
 /// </summary>
 public class HawkHandler : AuthenticationHandler<HawkOptions>
 {
@@ -24,14 +24,23 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="HawkHandler"/>.
+    /// Initializes a new instance of <see cref="HawkHandler"/>
     /// </summary>
-    /// <inheritdoc />
+    /// <param name="options">The monitor used to track options changes</param>
+    /// <param name="logger">The logger factory used to create loggers</param>
+    /// <param name="encoder">The URL encoder used for URL encoding</param>
     public HawkHandler(IOptionsMonitor<HawkOptions> options, ILoggerFactory logger, UrlEncoder encoder) : base(options, logger, encoder)
     {
     }
 
     /// <inheritdoc />
+    /// <summary>
+    /// Handles the authentication process for Hawk authentication
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous authentication operation, containing the
+    /// <see cref="AuthenticateResult"/> of the authentication attempt.
+    /// </returns>
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.Headers.TryGetValue("Authorization", out var authorization))
@@ -39,7 +48,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             return HandleFailureAuthenticateResult("Missing Authorization header.");
         }
         var authorHeaderValue = authorization.First();
-        if (!authorHeaderValue.StartsWith(HawkDefaults.AuthenticationScheme))
+        if (authorHeaderValue is null || !authorHeaderValue.StartsWith(HawkDefaults.AuthenticationScheme))
         {
             return HandleFailureAuthenticateResult("Invalid authorization scheme.");
         }
@@ -97,7 +106,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
         }
 
         var host = Options.HostResolver.Resolve(Request, Options.ForwardIndex);
-        var hawkRawData = new HawkRawData
+        var hawkData = new HawkData
         {
             Timestamp = authParams.Ts,
             Nonce = authParams.Nonce,
@@ -111,7 +120,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             Dlg = authParams.Dlg
         };
 
-        var mac = crypto.CalculateRequestMac(hawkRawData);
+        var mac = crypto.CalculateRequestMac(hawkData);
         if (!authParams.Mac.Equals(mac, StringComparison.Ordinal))
         {
             return HandleFailureAuthenticateResult("Bad mac.");
@@ -144,7 +153,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
         if (Options.EnableServerAuthorization && credential.EnableServerAuthorization)
         {
             Context.Items["hawk:credential"] = credential;
-            Context.Items["hawk:hawkRawData"] = hawkRawData;
+            Context.Items["hawk:hawkData"] = hawkData;
         }
 
         return AuthenticateResult.Success(ticket);
@@ -152,6 +161,11 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
     }
 
     /// <inheritdoc />
+    /// <summary>
+    /// Handles the challenge response for unauthorized requests
+    /// </summary>
+    /// <param name="properties">The authentication properties</param>
+    /// <returns>A task that represents the asynchronous challenge operation</returns>
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
         if (!Options.DisableChallenge && Context.Items.TryGetValue("hawk:www-authenticate", out var wwwAuthenticate))
@@ -162,12 +176,12 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
     }
 
     /// <summary>
-    /// Creates an <see cref="AuthenticationTicket"/> from the specified <paramref name="credential"/>.
+    /// Creates an <see cref="AuthenticationTicket"/> from the specified <paramref name="credential"/>
     /// </summary>
-    /// <param name="identity">The <see cref="ClaimsIdentity"/>.</param>
-    /// <param name="properties">The <see cref="AuthenticationProperties"/>.</param>
-    /// <param name="credential">The <see cref="HawkCredential"/>.</param>
-    /// <returns>The <see cref="AuthenticationTicket"/>.</returns>
+    /// <param name="identity">The claims identity</param>
+    /// <param name="properties">The authentication properties</param>
+    /// <param name="credential">The Hawk credential</param>
+    /// <returns>The authentication ticket</returns>
     protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, HawkCredential credential)
     {
         var claims = new[] { new Claim(ClaimTypes.Name, credential.User ?? credential.AuthId), new Claim(ClaimTypes.NameIdentifier, credential.AuthId) };
@@ -177,6 +191,13 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
         return new AuthenticationTicket(context.Principal!, context.Properties, Scheme.Name);
     }
 
+    /// <summary>
+    /// Handles authentication failure by creating an appropriate failure result
+    /// </summary>
+    /// <param name="failureMessage">The failure message describing the authentication failure</param>
+    /// <param name="ts">Optional server timestamp for clock synchronization (used when timestamp validation fails)</param>
+    /// <param name="tsm">Optional timestamp MAC for clock synchronization (used when timestamp validation fails)</param>
+    /// <returns>An authentication failure result</returns>
     protected virtual AuthenticateResult HandleFailureAuthenticateResult(string failureMessage, long? ts = null, string? tsm = null)
     {
         if (!Options.DisableChallenge)

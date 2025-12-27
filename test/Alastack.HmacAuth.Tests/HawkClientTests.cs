@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using Sample.Common;
 using System.Net;
 using System.Text;
 using Xunit.Abstractions;
@@ -182,10 +183,10 @@ public class HawkClientTests
                     options.NonceGenerator = stubNonceGenerator.Object;
                 });
                 services.Configure(configureOptions);
-                services.AddTransient<HawkDelegatingHandler>();
+                services.AddTransient<InjectableHawkDelegatingHandler>();
                 services.AddTransient<TestHawkDelegatingHandler>();
                 services.AddHttpClient("ApiClient")
-                    .AddHttpMessageHandler<HawkDelegatingHandler>()
+                    .AddHttpMessageHandler<InjectableHawkDelegatingHandler>()
                     .AddHttpMessageHandler<TestHawkDelegatingHandler>();
             })
             .Build();

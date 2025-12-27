@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using Sample.Common;
 using System.Text;
 using Xunit.Abstractions;
 using static System.Net.Mime.MediaTypeNames;
@@ -82,10 +83,10 @@ public class HmacClientTests
                     options.NonceGenerator = stubNonceGenerator.Object;
                 });
                 services.Configure(configureOptions);
-                services.AddTransient<HmacDelegatingHandler>();
+                services.AddTransient<InjectableHmacDelegatingHandler>();
                 services.AddTransient<TestHmacDelegatingHandler>();
                 services.AddHttpClient("ApiClient")
-                    .AddHttpMessageHandler<HmacDelegatingHandler>()
+                    .AddHttpMessageHandler<InjectableHmacDelegatingHandler>()
                     .AddHttpMessageHandler<TestHmacDelegatingHandler>();
             })
             .Build();

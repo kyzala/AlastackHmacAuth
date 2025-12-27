@@ -55,11 +55,11 @@ var host = new HostBuilder()
         options.AppId = "id123";
         options.AppKey = "3@uo45er?";
     });
-    services.AddSingleton<IValidateOptions<HmacSettings>, HmacSettingsValidation>();
-    services.AddTransient<HmacDelegatingHandler>();
+    services.AddSingleton<IValidateOptions<HmacSettings>, HmacConfigValidation>();
+    services.AddTransient<InjectableHmacDelegatingHandler>();
     services.AddHttpClient<ApiClient>("ApiClient", httpClient => 
         httpClient.BaseAddress = "https://localhost:5001/")
-    .AddHttpMessageHandler<HmacDelegatingHandler>();
+    .AddHttpMessageHandler<InjectableHmacDelegatingHandler>();
 }).Build();
 var apiClient = host.Services.GetRequiredService<ApiClient>();
 await apiClient.CreateTodoItemAsync(new TodoItem { Name = "walk dog" });
@@ -116,11 +116,11 @@ var host = new HostBuilder()
         options.AuthId = "id123";
         options.AuthKey = "3@uo45er?";
     });
-    services.AddSingleton<IValidateOptions<HawkSettings>, HawkSettingsValidation>();
-    services.AddTransient<HawkDelegatingHandler>();
+    services.AddSingleton<IValidateOptions<HawkSettings>, HawkConfigValidation>();
+    services.AddTransient<InjectableHawkDelegatingHandler>();
     services.AddHttpClient<ApiClient>("ApiClient", httpClient => 
         httpClient.BaseAddress = "https://localhost:5001/")
-    .AddHttpMessageHandler<HawkDelegatingHandler>();
+    .AddHttpMessageHandler<InjectableHawkDelegatingHandler>();
 }).Build();
 var apiClient = host.Services.GetRequiredService<ApiClient>();
 await apiClient.CreateTodoItemAsync(new TodoItem { Name = "walk dog" });
@@ -148,7 +148,6 @@ This repo builds the following packages.
 | Alastack.HmacAuth.AspNetCore | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.AspNetCore)](https://www.nuget.org/packages/Alastack.HmacAuth.AspNetCore) | Hmac and Hawk authentication for ASP.NET Core.|
 | Alastack.HmacAuth.Sql             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.Sql)](https://www.nuget.org/packages/Alastack.HmacAuth.Sql) | Sql CredentialProvider.                   |
 | Alastack.HmacAuth.MongoDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.MongoDB)](https://www.nuget.org/packages/Alastack.HmacAuth.MongoDB) | MongoDB CredentialProvider.                   |
-| Alastack.HmacAuth.EntityFrameworkCore             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.EntityFrameworkCore)](https://www.nuget.org/packages/Alastack.HmacAuth.EntityFrameworkCore) | EntityFrameworkCore CredentialProvider.                   |
 | Alastack.HmacAuth.LiteDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.LiteDB)](https://www.nuget.org/packages/Alastack.HmacAuth.LiteDB) | LiteDB CredentialProvider.                   |
 
 ## Configure Authentication
@@ -205,6 +204,10 @@ A HTTP replay request Validator abstraction. `ReplayRequestValidator` is the def
 - **`ICredentialProvider<TCredential>`**
 
 A credential provider abstraction. `MemoryCredentialProvider<TCredential>` is a in-memory implementation.
+
+- **`IConfigValidator<TConfig>`**
+
+A hmac config validator abstraction.
 
 - **`IDataCache`**
 

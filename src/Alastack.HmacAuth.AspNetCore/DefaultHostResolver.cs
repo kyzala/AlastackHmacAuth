@@ -18,20 +18,26 @@ public class DefaultHostResolver : IHostResolver
     {
         if (request.Headers.TryGetValue("X-Forwarded-Host", out var xForwardedHost))
         {
-            var hostsArray = xForwardedHost.First().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            var hostArray = hostsArray[^(forwardIndex + 1)].Split(':');
-            if (hostArray.Length == 2)
+            var hostsArray = xForwardedHost.First()?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (hostsArray is not null && hostsArray.Length > 0)
             {
-                return new HostString(hostArray[0], Int32.Parse(hostArray[1]));
+                var hostArray = hostsArray[^(forwardIndex + 1)].Split(':');
+                if (hostArray.Length == 2)
+                {
+                    return new HostString(hostArray[0], Int32.Parse(hostArray[1]));
+                }
+                if (request.Headers.TryGetValue("X-Forwarded-Proto", out var xForwardedProto))
+                {
+                    var protosArray = xForwardedProto.First()?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (protosArray is not null && protosArray.Length > 0)
+                    {
+                        var proto = protosArray[^(forwardIndex + 1)];
+                        var port = proto.Equals("https", StringComparison.OrdinalIgnoreCase) ? 443 : 80;
+                        return new HostString(hostArray[0], port);
+                    }
+                }
+                return new HostString(hostArray[0], 443);
             }
-            if (request.Headers.TryGetValue("X-Forwarded-Proto", out var xForwardedProto))
-            {
-                var protosArray = xForwardedProto.First().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                var proto = protosArray[^(forwardIndex + 1)];
-                var port = proto.Equals("https", StringComparison.OrdinalIgnoreCase) ? 443 : 80;
-                return new HostString(hostArray[0], port);
-            }
-            return new HostString(hostArray[0], 443);
         }
         var port1 = request.Host.Port ?? (request.IsHttps ? 443 : 80);
         return new HostString(request.Host.Host, port1);

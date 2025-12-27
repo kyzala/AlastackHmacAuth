@@ -34,10 +34,10 @@ namespace ConfigSample
                     //{                        
                     //    options.GetSpecificData = async (request, options) => await Task.FromResult("some-data");
                     //});
-                    services.AddSingleton<IValidateOptions<HawkSettings>, HawkSettingsValidation>();
-                    services.AddTransient<HawkDelegatingHandler>();
+                    services.AddSingleton<IValidateOptions<HawkSettings>, HawkConfigValidation>();
+                    services.AddTransient<InjectableHawkDelegatingHandler>();
                     services.AddHttpClient<ApiClient>("ApiClient", httpClient => httpClient.BaseAddress = serverAddress)
-                    .AddHttpMessageHandler<HawkDelegatingHandler>();
+                    .AddHttpMessageHandler<InjectableHawkDelegatingHandler>();
                 })
                 .Build();
         }

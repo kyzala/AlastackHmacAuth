@@ -33,14 +33,14 @@ namespace RefitSample
                         options.AppId = "id123";
                         options.AppKey = "3@uo45er?";
                     });
-                    services.AddSingleton<IValidateOptions<HmacSettings>, HmacSettingsValidation>();
-                    services.AddTransient<HmacDelegatingHandler>();
+                    services.AddSingleton<IValidateOptions<HmacSettings>, HmacConfigValidation>();
+                    services.AddTransient<InjectableHmacDelegatingHandler>();
                     services.AddRefitClient<IApiClient>().ConfigureHttpClient(httpClient =>
                     {
                         httpClient.BaseAddress = serverAddress;
                         httpClient.DefaultRequestVersion = new Version(2, 0);
                     })
-                    .AddHttpMessageHandler<HmacDelegatingHandler>();
+                    .AddHttpMessageHandler<InjectableHmacDelegatingHandler>();
                 })
                 .Build();
         }
@@ -60,10 +60,10 @@ namespace RefitSample
                         options.EnableServerAuthorizationValidation = true;
                         options.GetSpecificData = async (request, options) => await Task.FromResult("some-data");
                     });
-                    services.AddSingleton<IValidateOptions<HawkSettings>, HawkSettingsValidation>();
-                    services.AddTransient<HawkDelegatingHandler>();
+                    services.AddSingleton<IValidateOptions<HawkSettings>, HawkConfigValidation>();
+                    services.AddTransient<InjectableHawkDelegatingHandler>();
                     services.AddRefitClient<IApiClient>().ConfigureHttpClient(httpClient => httpClient.BaseAddress = serverAddress)
-                    .AddHttpMessageHandler<HawkDelegatingHandler>();
+                    .AddHttpMessageHandler<InjectableHawkDelegatingHandler>();
                 })
                 .Build();
         }

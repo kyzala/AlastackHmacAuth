@@ -9,7 +9,7 @@ using System.Text.Encodings.Web;
 namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
-/// Authentication handler for Hmac authentication.
+/// Authentication handler for HMAC-based authentication in ASP.NET Core
 /// </summary>
 public class HmacHandler : AuthenticationHandler<HmacOptions>
 {
@@ -24,14 +24,23 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="HmacHandler"/>.
+    /// Initializes a new instance of <see cref="HmacHandler"/>
     /// </summary>
-    /// <inheritdoc />
+    /// <param name="options">The monitor used to track HMAC options changes</param>
+    /// <param name="logger">The logger factory used to create loggers</param>
+    /// <param name="encoder">The URL encoder used for URL encoding</param>
     public HmacHandler(IOptionsMonitor<HmacOptions> options, ILoggerFactory logger, UrlEncoder encoder) : base(options, logger, encoder)
     {
     }
 
     /// <inheritdoc />
+    /// <summary>
+    /// Handles the authentication process for HMAC authentication
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous authentication operation, containing the
+    /// <see cref="AuthenticateResult"/> of the authentication attempt.
+    /// </returns>
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.Headers.TryGetValue("Authorization", out var authorization))
@@ -39,7 +48,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
             return HandleFailureAuthenticateResult("Missing Authorization header.");
         }
         var authorHeaderValue = authorization.First();
-        if (!authorHeaderValue.StartsWith(HmacDefaults.AuthenticationScheme))
+        if (authorHeaderValue is null || !authorHeaderValue.StartsWith(HmacDefaults.AuthenticationScheme))
         {
             return HandleFailureAuthenticateResult("Invalid authorization scheme.");
         }
@@ -102,8 +111,8 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
         var resource = $"{Request.PathBase.ToUriComponent()}{Request.Path.ToUriComponent()}{Request.QueryString.ToUriComponent()}";
 
         var host = Options.HostResolver.Resolve(Request, Options.ForwardIndex);
-        var rawData = $"{authParams.AppId}\n{authParams.Timestamp}\n{authParams.Nonce}\n{Request.Method}\n{resource}\n{host.Host}\n{host.Port!.Value}\n{authParams.PayloadHash}";
-        var signature = crypto.CalculateMac(rawData);
+        var hmacData = $"{authParams.AppId}\n{authParams.Timestamp}\n{authParams.Nonce}\n{Request.Method}\n{resource}\n{host.Host}\n{host.Port!.Value}\n{authParams.PayloadHash}";
+        var signature = crypto.CalculateMac(hmacData);
         if (!authParams.Signature.Equals(signature, StringComparison.Ordinal))
         {
             return HandleFailureAuthenticateResult("Bad mac.");
@@ -136,6 +145,11 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
     }
 
     /// <inheritdoc />
+    /// <summary>
+    /// Handles the challenge response for unauthorized requests
+    /// </summary>
+    /// <param name="properties">The authentication properties</param>
+    /// <returns>A task that represents the asynchronous challenge operation</returns>
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
         if (!Options.DisableChallenge && Context.Items.TryGetValue("hawk:www-authenticate", out var wwwAuthenticate))
@@ -146,12 +160,12 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
     }
 
     /// <summary>
-    /// Creates an <see cref="AuthenticationTicket"/> from the specified <paramref name="credential"/>.
+    /// Creates an <see cref="AuthenticationTicket"/> from the specified <paramref name="credential"/>
     /// </summary>
-    /// <param name="identity">The <see cref="ClaimsIdentity"/>.</param>
-    /// <param name="properties">The <see cref="AuthenticationProperties"/>.</param>
-    /// <param name="credential">The <see cref="HmacCredential"/>.</param>
-    /// <returns>The <see cref="AuthenticationTicket"/>.</returns>
+    /// <param name="identity">The claims identity</param>
+    /// <param name="properties">The authentication properties</param>
+    /// <param name="credential">The HMAC credential</param>
+    /// <returns>The authentication ticket</returns>
     protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, HmacCredential credential)
     {
         var claims = new[] { new Claim(ClaimTypes.Name, credential.AppId), new Claim(ClaimTypes.NameIdentifier, credential.AppId) };
@@ -161,6 +175,11 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
         return new AuthenticationTicket(context.Principal!, context.Properties, Scheme.Name);
     }
 
+    /// <summary>
+    /// Handles authentication failure by creating an appropriate failure result
+    /// </summary>
+    /// <param name="failureMessage">The failure message describing the authentication failure</param>
+    /// <returns>An authentication failure result</returns>
     protected virtual AuthenticateResult HandleFailureAuthenticateResult(string failureMessage)
     {
         if (!Options.DisableChallenge)
