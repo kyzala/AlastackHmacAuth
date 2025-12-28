@@ -1,17 +1,16 @@
-namespace ApiProxy
+namespace ApiProxy;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddReverseProxy()
-            .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
-            var app = builder.Build();
+        builder.Services.AddReverseProxy()
+        .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+        var app = builder.Build();
 
-            app.MapReverseProxy();
-            app.Run();
-        }
+        app.MapReverseProxy();
+        app.Run();
     }
 }

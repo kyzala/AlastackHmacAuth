@@ -7,11 +7,8 @@
     <Nullable>enable</Nullable>
 	<NoWarn>$(NoWarn);1591</NoWarn>
 	<GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <StartupObject></StartupObject>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="appsettings.json" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="appsettings.json">
@@ -23,12 +20,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Alastack.HmacAuth\Alastack.HmacAuth.csproj" />
     <ProjectReference Include="..\..\Sample.Common\Sample.Common.csproj" />
   </ItemGroup>
 

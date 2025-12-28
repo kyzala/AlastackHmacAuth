@@ -5,6 +5,8 @@ Console.WriteLine(Environment.Version);
 
 const string SeedArgs = "/seed";
 bool seed = true;
+const string appId = "id123";
+const string appKey = "3@uo45er?";
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
@@ -17,8 +19,8 @@ builder.Services.AddAuthentication()
     var keyName = "authId";
     var credential = new HawkCredential
     {
-        AuthId = "id123",
-        AuthKey = "3@uo45er?",
+        AuthId = appId,
+        AuthKey = appKey,
         EnableServerAuthorization = true,
         IncludeResponsePayloadHash = true,
     };
@@ -38,8 +40,8 @@ builder.Services.AddAuthentication()
     var keyName = "appId";
     var credential = new HmacCredential
     {
-        AppId = "id123",
-        AppKey = "3@uo45er?"
+        AppId = appId,
+        AppKey = appKey
     };
     var provider = new LiteDBCredentialProvider<HmacCredential>(connectionString, collectionName, keyName);
     // Init seed data.
