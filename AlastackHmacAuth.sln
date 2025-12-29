@@ -54,6 +54,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientHostSample", "samples
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientBasicSample", "samples\clients\ClientBasicSample\ClientBasicSample.csproj", "{9ED99B9B-B6CD-F649-F786-1F59901B7704}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreCredentialSample", "samples\credentials\EFCoreCredentialSample\EFCoreCredentialSample.csproj", "{5E33AC72-0DAE-0FEA-10DD-D590A6BEFDCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alastack.HmacAuth.EFCore", "samples\credentials\Alastack.HmacAuth.EFCore\Alastack.HmacAuth.EFCore.csproj", "{7174786B-4CCB-2765-493B-E2324B4C8BEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +124,14 @@ Global
 		{9ED99B9B-B6CD-F649-F786-1F59901B7704}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ED99B9B-B6CD-F649-F786-1F59901B7704}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ED99B9B-B6CD-F649-F786-1F59901B7704}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E33AC72-0DAE-0FEA-10DD-D590A6BEFDCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E33AC72-0DAE-0FEA-10DD-D590A6BEFDCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E33AC72-0DAE-0FEA-10DD-D590A6BEFDCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E33AC72-0DAE-0FEA-10DD-D590A6BEFDCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7174786B-4CCB-2765-493B-E2324B4C8BEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7174786B-4CCB-2765-493B-E2324B4C8BEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7174786B-4CCB-2765-493B-E2324B4C8BEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7174786B-4CCB-2765-493B-E2324B4C8BEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +155,8 @@ Global
 		{EA63FCFD-4F52-C65B-8363-B4183DF2B689} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{09064B85-4B20-1900-AE28-9B1937865515} = {866C6D37-AF91-41F0-A44B-8FAA6E94EDB4}
 		{9ED99B9B-B6CD-F649-F786-1F59901B7704} = {866C6D37-AF91-41F0-A44B-8FAA6E94EDB4}
+		{5E33AC72-0DAE-0FEA-10DD-D590A6BEFDCF} = {C0C4EB77-CBD7-4D80-84C5-AF39FAD2588E}
+		{7174786B-4CCB-2765-493B-E2324B4C8BEE} = {C0C4EB77-CBD7-4D80-84C5-AF39FAD2588E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5E9B594-ACDB-4D4B-B3B5-99B6CD5DCFB2}

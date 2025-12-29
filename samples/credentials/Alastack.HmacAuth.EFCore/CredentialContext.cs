@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Alastack.HmacAuth.EntityFrameworkCore;
+namespace Alastack.HmacAuth.EFCore;
 
 /// <summary>
 /// A DbContext instance represents a session with the database and can be used to query and save
@@ -36,15 +36,8 @@ public class CredentialContext<TCredential> : DbContext where TCredential : clas
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        ConfigureCredentialContext(builder);
-    }
 
-    private void ConfigureCredentialContext(ModelBuilder builder)
-    {
-        builder.Entity<TCredential>().ToTable(_tableName);            
-        builder.Entity<TCredential>(b =>
-        {
-            b.HasKey(_keyName);
-        });
+        builder.Entity<TCredential>().ToTable(_tableName);
+        builder.Entity<TCredential>().HasKey(_keyName);
     }
 }

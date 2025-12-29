@@ -1,4 +1,4 @@
-using Alastack.HmacAuth.EntityFrameworkCore;
+using Alastack.HmacAuth.EFCore;
 using Alastack.HmacAuth.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 

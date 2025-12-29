@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Alastack.HmacAuth.Credentials;
+using Microsoft.EntityFrameworkCore;
 
-namespace Alastack.HmacAuth.EntityFrameworkCore;
+namespace Alastack.HmacAuth.EFCore;
 
 /// <summary>
 /// The MongoDB implementation of <see cref="ICredentialProvider{TCredential}"/>.

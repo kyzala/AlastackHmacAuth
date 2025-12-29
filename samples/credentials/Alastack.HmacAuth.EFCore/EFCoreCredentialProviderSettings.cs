@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth.EntityFrameworkCore;
+﻿namespace Alastack.HmacAuth.EFCore;
 
 /// <summary>
 /// EFCore CredentialProvider settings.
