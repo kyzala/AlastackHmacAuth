@@ -14,7 +14,7 @@ Client：
 dotnet add package Alastack.HmacAuth
 ```
 
-AspNetCore：
+Service：
 
 ```
 dotnet add package Alastack.HmacAuth.AspNetCore
@@ -22,10 +22,10 @@ dotnet add package Alastack.HmacAuth.AspNetCore
 
 ### Hmac Authentication
 
-The following code snippet demonstrates creating a Hmac authentication client:
+The following code snippet demonstrates creating a Hmac authentication client.
 
 ```csharp
-var authHandler = new HmacDelegatingHandler("id123", "3@uo45er?")
+var authHandler = new HmacDelegatingHandler("appId", "appKey")
 {
     InnerHandler = new SocketsHttpHandler
     {
@@ -44,7 +44,7 @@ var client = new HttpClient(authHandler, disposeHandler: false)
 };
 ```
 
-The following code snippet demonstrates creating a Hmac authentication client with dependency injection and then invoking it:
+The following code snippet demonstrates creating a Hmac authentication client with dependency injection.
 
 ```csharp
 var host = new HostBuilder()
@@ -52,8 +52,8 @@ var host = new HostBuilder()
 {
     services.Configure<HmacSettings>(options =>
     {
-        options.AppId = "id123";
-        options.AppKey = "3@uo45er?";
+        options.AppId = "appId";
+        options.AppKey = "appKey";
     });
     services.AddSingleton<IValidateOptions<HmacSettings>, HmacConfigValidation>();
     services.AddTransient<InjectableHmacDelegatingHandler>();
@@ -65,14 +65,14 @@ var apiClient = host.Services.GetRequiredService<ApiClient>();
 await apiClient.CreateTodoItemAsync(new TodoItem { Name = "walk dog" });
 ```
 
-The following code will add Hmac authentication for AspNetCore:
+The following code will add Hmac authentication for AspNetCore.
 
 ```csharp
 builder.Services.AddAuthentication()
 .AddHmac(options =>
 {
-     var credential = new HmacCredential { AppId = "id123", AppKey = "3@uo45er?" };
-     var dict = new Dictionary<string, HmacCredential> { { "id123", credential } };
+     var credential = new HmacCredential { AppId = "appId", AppKey = "appKey" };
+     var dict = new Dictionary<string, HmacCredential> { { "appId", credential } };
      options.CredentialProvider = new MemoryCredentialProvider<HmacCredential>(dict);
 });
 ```
@@ -81,12 +81,11 @@ builder.Services.AddAuthentication()
 
 You can use [Postman](https://www.postman.com/) as Hawk authentication client. For more information see [Authenticate with Hawk access authentication](https://learning.postman.com/docs/sending-requests/authorization/hawk-authentication/).
 
-![](docs/hawk.png)
 
-The following code snippet demonstrates creating a Hawk authentication client:
+The following code snippet demonstrates creating a Hawk authentication client.
 
 ```csharp
-var authHandler = new HawkDelegatingHandler("id123", "3@uo45er?")
+var authHandler = new HawkDelegatingHandler("authId", "authKey")
 {
     InnerHandler = new SocketsHttpHandler
     {
@@ -105,7 +104,7 @@ var client = new HttpClient(authHandler, disposeHandler: false)
 };
 ```
 
-The following code snippet demonstrates creating a Hawk authentication client with dependency injection and then invoking it:
+The following code snippet demonstrates creating a Hawk authentication client with dependency injection.
 
 ```csharp
 var host = new HostBuilder()
@@ -113,8 +112,8 @@ var host = new HostBuilder()
 {
     services.Configure<HawkSettings>(options =>
     {
-        options.AuthId = "id123";
-        options.AuthKey = "3@uo45er?";
+        options.AuthId = "authId";
+        options.AuthKey = "authKey";
     });
     services.AddSingleton<IValidateOptions<HawkSettings>, HawkConfigValidation>();
     services.AddTransient<InjectableHawkDelegatingHandler>();
@@ -126,14 +125,14 @@ var apiClient = host.Services.GetRequiredService<ApiClient>();
 await apiClient.CreateTodoItemAsync(new TodoItem { Name = "walk dog" });
 ```
 
-The following code will add Hawk authentication for AspNetCore:
+The following code will add Hawk authentication for AspNetCore.
 
 ```csharp
 builder.Services.AddAuthentication()
 .AddHawk(options =>
 {
-     var credential = new HawkCredential { AuthId = "id123", AuthKey = "3@uo45er?" };
-     var dict = new Dictionary<string, HawkCredential> { { "id123", credential } };
+     var credential = new HawkCredential { AuthId = "authId", AuthKey = "authKey" };
+     var dict = new Dictionary<string, HawkCredential> { { "authId", credential } };
      options.CredentialProvider = new MemoryCredentialProvider<HawkCredential>(dict);
 });
 ```
@@ -152,8 +151,8 @@ This repo builds the following packages.
 
 ## Configure Authentication
 
-- **Hmac** - `HmacSettings` for authentication client, `HmacOptions` for AspNetCoe.
-- **Hawk** - `HawkSettings` for authentication client, `HawkOptions` for AspNetCoe.
+- **Hmac** - `HmacSettings` for authentication client, `HmacOptions` for AspNetCore.
+- **Hawk** - `HawkSettings` for authentication client, `HawkOptions` for AspNetCore.
 
 ## Performance
 
@@ -162,7 +161,7 @@ This repo builds the following packages.
 - `IDataCache` instance stores credential data.
 - `CacheKeyPrefix` and `CredentialCacheTime` options configure cache parameters.
 
-## API Extentions
+## API Extensions
 
 - **`ICrypto`**
 
@@ -207,7 +206,7 @@ A credential provider abstraction. `MemoryCredentialProvider<TCredential>` is a 
 
 - **`IConfigValidator<TConfig>`**
 
-A hmac config validator abstraction.
+A Hmac config validator abstraction.
 
 - **`IDataCache`**
 
