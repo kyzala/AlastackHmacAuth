@@ -6,7 +6,8 @@ using Sample.Common;
 
 namespace ApiHostSample.Controllers;
 
-[Authorize(AuthenticationSchemes = "Hawk,Hmac")]
+[Authorize(AuthenticationSchemes = "HmacOrHawk")]
+//[Authorize(AuthenticationSchemes = "Hawk,Hmac")]
 //[Authorize("HawkPolicy")]
 [Route("api/[controller]")]
 [ApiController]

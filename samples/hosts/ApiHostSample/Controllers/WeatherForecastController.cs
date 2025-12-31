@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ApiHostSample.Controllers;
 
-[Authorize(AuthenticationSchemes = "Hawk,Hmac")]
+[Authorize(AuthenticationSchemes = "HmacOrHawk")]
+//[Authorize(AuthenticationSchemes = "Hawk,Hmac")]
+//[Authorize(Policy = HawkOrHmacPolicy.PolicyName)]
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase

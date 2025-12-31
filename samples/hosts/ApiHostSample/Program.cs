@@ -2,6 +2,7 @@ using Alastack.HmacAuth;
 using Alastack.HmacAuth.AspNetCore;
 using Alastack.HmacAuth.Credentials;
 using ApiHostSample.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiHostSample;
@@ -20,15 +21,32 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoList"));
 
+        
         builder.Services.AddAuthentication(options =>
         {
             //options.DefaultScheme = HawkDefaults.AuthenticationScheme;
 
             //options.DefaultAuthenticateScheme = HawkDefaults.AuthenticationScheme;
             //options.DefaultChallengeScheme = HawkDefaults.AuthenticationScheme;
-            
+
             //options.DefaultAuthenticateScheme = HmacDefaults.AuthenticationScheme;
             //options.DefaultChallengeScheme = HmacDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = "HmacOrHawk";
+            options.DefaultChallengeScheme = "HmacOrHawk";
+
+
+        })
+        .AddPolicyScheme("HmacOrHawk", "HmacOrHawk", options =>
+        {
+            options.ForwardDefaultSelector = context =>
+            {
+                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                if (authHeader?.StartsWith("Hmac ") == true)
+                    return "Hmac";
+                if (authHeader?.StartsWith("Hawk ") == true)
+                    return "Hawk";
+                return null; // Return the default challenge scheme
+            };
         })
         .AddHawk(options =>
         {
@@ -57,13 +75,14 @@ public class Program
             options.CredentialProvider = new MemoryCredentialProvider<HmacCredential>(dict);
         });
 
-        //builder.Services.AddAuthorization(options => 
+        //builder.Services.AddAuthorization(options =>
         //{
-        //    options.AddPolicy("HawkPolicy", builder => 
-        //    {
-        //        builder.AuthenticationSchemes.Add("Hawk");
-        //        builder.RequireAuthenticatedUser();
-        //    });
+        //    //options.AddPolicy(HawkOrHmacPolicy.PolicyName, builder =>
+        //    //{
+        //    //    builder.AddAuthenticationSchemes("Hmac", "Hawk")
+        //    //    .RequireAuthenticatedUser();
+        //    //});
+        //    options.AddPolicy(HawkOrHmacPolicy.PolicyName, HawkOrHmacPolicy.Build());
         //});
 
         var app = builder.Build();
@@ -75,3 +94,16 @@ public class Program
         app.Run();
     }
 }
+
+//public class HawkOrHmacPolicy
+//{
+//    public const string PolicyName = "HmacOrHawk";
+
+//    public static AuthorizationPolicy Build()
+//    {
+//        return new AuthorizationPolicyBuilder()
+//            .AddAuthenticationSchemes("Hawk", "Hmac")
+//            .RequireAuthenticatedUser()
+//            .Build();
+//    }
+//}
