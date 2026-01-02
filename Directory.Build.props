@@ -6,7 +6,7 @@
     <InvariantGlobalization>true</InvariantGlobalization>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<Authors>kyzala</Authors>
-	<Copyright>Copyright © 2023 kyzala</Copyright>
+	<Copyright>Copyright © 2026 kyzala</Copyright>
 	<PackageIcon>icon.png</PackageIcon>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageProjectUrl>https://github.com/kyzala/AlastackHmacAuth</PackageProjectUrl>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>	
-	<Version>2.1.0</Version>	
+	<Version>2.2.0</Version>	
 	<PackageTags>Alastack;Auth;Authentication;Hmac;Hawk;LiteDB</PackageTags>
 	<Description>A LiteDB CredentialProvider supports Hmac and Hawk authentication.</Description>
   </PropertyGroup>
