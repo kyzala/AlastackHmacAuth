@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -105,7 +105,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             }
         }
 
-        var host = Options.HostResolver.Resolve(Request, Options.ForwardIndex);
+        var host = Options.HostResolver.Resolve(Request);
         var hawkData = new HawkData
         {
             Timestamp = authParams.Ts,
@@ -121,7 +121,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
         };
 
         var mac = crypto.CalculateRequestMac(hawkData);
-        if (!authParams.Mac.Equals(mac, StringComparison.Ordinal))
+        if (!FixedTimeComparer.Equals(authParams.Mac, mac))
         {
             return HandleFailureAuthenticateResult("Bad mac.");
         }
@@ -135,7 +135,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             {
                 var contentType = Request.ContentType?.Split(';')[0];
                 var payloadHash = crypto.CalculatePayloadHash(payload, contentType);
-                if (!authParams.Hash.Equals(payloadHash, StringComparison.Ordinal))
+                if (!FixedTimeComparer.Equals(authParams.Hash, payloadHash))
                 {
                     return HandleFailureAuthenticateResult("Bad payload hash.");
                 }

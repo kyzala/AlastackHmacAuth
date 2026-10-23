@@ -1,4 +1,4 @@
-﻿using Alastack.HmacAuth.Credentials;
+using Alastack.HmacAuth.Credentials;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Alastack.HmacAuth.AspNetCore;
@@ -8,11 +8,6 @@ namespace Alastack.HmacAuth.AspNetCore;
 /// </summary>
 public class HmacOptions : AuthenticationSchemeOptions
 {
-    /// <summary>
-    /// Reverse host index of forwarding header. Using 0 base index.
-    /// </summary>
-    public int ForwardIndex { get; set; }
-
     /// <summary>
     /// Whether time skew validation is required. Defaults to <c>true</c>.
     /// </summary>
@@ -109,11 +104,6 @@ public class HmacOptions : AuthenticationSchemeOptions
     public override void Validate()
     {
         base.Validate();
-
-        if (ForwardIndex < 0)
-        {
-            throw new ArgumentException($"{nameof(ForwardIndex)} must be greater than or equal to zero.", nameof(ForwardIndex));
-        }
 
         if (MaxReplayRequestAge < 0)
         {

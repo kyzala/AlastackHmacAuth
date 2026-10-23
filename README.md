@@ -185,16 +185,75 @@ a HTTP Authorization header parameter extractor abstraction. `HmacParameterExtra
 
 - **`IHostResolver`**
 
-A host resolver abstraction. `DefaultHostResolver` is the default implementation. `DefaultHostResolver` supports forwarded header. `HmacOptions.ForwardIndex` and `HawkOptions.ForwardIndex` is used to set the reverse host index of the forwarding header.
+A host resolver abstraction. `DefaultHostResolver` is the default implementation.
 
-The following HTTP headers display X-Forwarded information.
+It resolves the host from the **leftmost** `X-Forwarded-Host` entry — the host originally used by the client when signing the request — and falls back to `HttpRequest.Host` (with an explicit port) when the header is absent or cannot be parsed. This works whether the ASP.NET Core Forwarded Headers Middleware is registered or not.
 
-```http
-X-Forwarded-Host: 192.168.1.103, 192.168.1.102:1080, 192.168.1.103:2080, 192.168.1.102, 192.168.1.103:3080
-X-Forwarded-Proto: http, http, http, https, http
+The Forwarded Headers Middleware is only needed when other application code depends on `HttpRequest.Host`/`HttpRequest.Scheme` reflecting the original client request:
+
+```csharp
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 5 // number of proxies in the chain
+});
 ```
 
-If `ForwardIndex` is `3`, `DefaultHostResolver` will return `192.168.1.102:1080`.
+If you register it, configure `KnownProxies`/`KnownNetworks` so that only trusted proxies can rewrite `HttpRequest.Host`; entries from untrusted sources are ignored.
+
+**Example 1: trust specific proxy IP addresses** (`KnownProxies`)
+
+```csharp
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 2,
+    KnownProxies =
+    {
+        IPAddress.Parse("10.0.0.10"), // nginx ingress
+        IPAddress.Parse("10.0.0.11")  // api gateway
+    }
+});
+```
+
+**Example 2: trust a proxy subnet** (`KnownNetworks`)
+
+```csharp
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 2,
+    KnownNetworks =
+    {
+        new IPNetwork(IPAddress.Parse("10.0.0.0"), 8) // trust the whole internal proxy subnet
+    }
+});
+```
+
+**Example 3: cloud/container environments** (e.g. Kubernetes, Azure App Service) where proxy IPs are dynamic — trust all networks. This is safe only when the app is unreachable directly from the internet and all traffic must pass through the ingress/load balancer:
+
+```csharp
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
+
+var options = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 5
+};
+options.KnownNetworks.Clear();
+options.KnownProxies.Clear();
+options.KnownNetworks.Add(new IPNetwork(IPAddress.Any, 0)); // trust any proxy
+app.UseForwardedHeaders(options);
+```
+
+> **Warning**: without `KnownProxies`/`KnownNetworks` restrictions, or when trusting all networks while the app is directly reachable, a client can forge `X-Forwarded-Host` and change `HttpRequest.Host` for the rest of the pipeline. To keep legitimate HMAC/Hawk requests working, the leftmost `X-Forwarded-Host` entry must match the host the client signed; always lock down which proxies are trusted.
 
 - **`IReplayRequestValidator`**
 

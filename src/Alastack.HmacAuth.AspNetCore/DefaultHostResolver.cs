@@ -1,45 +1,48 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace Alastack.HmacAuth.AspNetCore;
 
-/*
- * X-Forwarded-For: ::ffff:192.168.1.102, ::ffff:192.168.1.103, ::ffff:192.168.1.102, ::ffff:192.168.1.103, ::ffff:192.168.1.102
- * X-Forwarded-Host: 192.168.1.103, 192.168.1.102:1080, 192.168.1.103:2080, 192.168.1.102:2080, 192.168.1.103:3080
- * X-Forwarded-Proto: http, http, http, http, http
- */
-
 /// <summary>
 /// The default implementation of <see cref="IHostResolver"/>.
+/// Resolves the host from the leftmost <c>X-Forwarded-Host</c> entry, which is the host originally
+/// used by the client, and falls back to <see cref="HttpRequest.Host"/> when the header is absent
+/// or cannot be parsed. The ASP.NET Core Forwarded Headers Middleware is not required.
 /// </summary>
 public class DefaultHostResolver : IHostResolver
 {
     /// <inheritdoc />
-    public HostString Resolve(HttpRequest request, int forwardIndex)
+    public HostString Resolve(HttpRequest request)
     {
-        if (request.Headers.TryGetValue("X-Forwarded-Host", out var xForwardedHost))
+        var hosts = request.Headers["X-Forwarded-Host"]
+            .ToString()
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (hosts.Length > 0)
         {
-            var hostsArray = xForwardedHost.First()?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (hostsArray is not null && hostsArray.Length > 0)
+            var hostArray = hosts[0].Split(':');
+            if (hostArray.Length == 2 && int.TryParse(hostArray[1], out var port))
             {
-                var hostArray = hostsArray[^(forwardIndex + 1)].Split(':');
-                if (hostArray.Length == 2)
-                {
-                    return new HostString(hostArray[0], Int32.Parse(hostArray[1]));
-                }
-                if (request.Headers.TryGetValue("X-Forwarded-Proto", out var xForwardedProto))
-                {
-                    var protosArray = xForwardedProto.First()?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (protosArray is not null && protosArray.Length > 0)
-                    {
-                        var proto = protosArray[^(forwardIndex + 1)];
-                        var port = proto.Equals("https", StringComparison.OrdinalIgnoreCase) ? 443 : 80;
-                        return new HostString(hostArray[0], port);
-                    }
-                }
-                return new HostString(hostArray[0], 443);
+                return new HostString(hostArray[0], port);
             }
+
+            if (hostArray.Length == 1)
+            {
+                var protos = request.Headers["X-Forwarded-Proto"]
+                    .ToString()
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var proto = protos.Length > 0 ? protos[0] : null;
+
+                var fallbackPort = string.Equals(proto, "https", StringComparison.OrdinalIgnoreCase) ? 443
+                    : string.Equals(proto, "http", StringComparison.OrdinalIgnoreCase) ? 80
+                    : request.IsHttps ? 443 : 80;
+
+                return new HostString(hostArray[0], fallbackPort);
+            }
+
+            // Unrecognized form (e.g. IPv6 literal or malformed port): fall back to Request.Host.
         }
-        var port1 = request.Host.Port ?? (request.IsHttps ? 443 : 80);
-        return new HostString(request.Host.Host, port1);
+
+        var currentPort = request.Host.Port ?? (request.IsHttps ? 443 : 80);
+        return new HostString(request.Host.Host, currentPort);
     }
 }

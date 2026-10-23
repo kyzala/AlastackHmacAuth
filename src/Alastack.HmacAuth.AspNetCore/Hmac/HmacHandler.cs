@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -110,10 +110,10 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
         // {appId}\n{timestamp}\n{nonce}\n{method}\n{resource}\n{host}\n{port}\n{payloadHash}
         var resource = $"{Request.PathBase.ToUriComponent()}{Request.Path.ToUriComponent()}{Request.QueryString.ToUriComponent()}";
 
-        var host = Options.HostResolver.Resolve(Request, Options.ForwardIndex);
+        var host = Options.HostResolver.Resolve(Request);
         var hmacData = $"{authParams.AppId}\n{authParams.Timestamp}\n{authParams.Nonce}\n{Request.Method}\n{resource}\n{host.Host}\n{host.Port!.Value}\n{authParams.PayloadHash}";
         var signature = crypto.CalculateMac(hmacData);
-        if (!authParams.Signature.Equals(signature, StringComparison.Ordinal))
+        if (!FixedTimeComparer.Equals(authParams.Signature, signature))
         {
             return HandleFailureAuthenticateResult("Bad mac.");
         }
@@ -126,7 +126,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
             try
             {
                 var payloadHash = crypto.CalculateHash(payload);
-                if (!authParams.PayloadHash.Equals(payloadHash, StringComparison.Ordinal))
+                if (!FixedTimeComparer.Equals(authParams.PayloadHash, payloadHash))
                 {
                     return HandleFailureAuthenticateResult("Bad payload hash.");
                 }
