@@ -1,8 +1,7 @@
-﻿using Alastack.HmacAuth;
+using Alastack.HmacAuth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using Sample.Common;
 using System.Net;
 using System.Text;
 using Xunit.Abstractions;
@@ -141,7 +140,7 @@ public class HawkClientTests
     }
 
     [Fact]
-    public void SendAsync_HawkClient_ValidateServerTimestampException()
+    public async Task SendAsync_HawkClient_ValidateServerTimestampException()
     {
         Action<HawkSettings> configureOptions = options =>
         {
@@ -154,7 +153,7 @@ public class HawkClientTests
         };
         var httpClient = CreateClient(configureOptions);
         var request = new HttpRequestMessage(HttpMethod.Delete, "http://a.b.c:5000/api/data/1");
-        Assert.Throws<AggregateException>(() => httpClient.SendAsync(request).Result);
+        await Assert.ThrowsAsync<HawkTimestampException>(() => httpClient.SendAsync(request));
     }
 
     private static HttpClient CreateClient(Action<HawkSettings> configureOptions)
@@ -163,21 +162,15 @@ public class HawkClientTests
         stubTimestampCalculator.Setup(tc => tc.Calculate(0)).Returns(1662118565);
 
         var stubNonceGenerator = new Mock<INonceGenerator>();
-        stubNonceGenerator.Setup(ng => ng.Generate("id123")).Returns("abcdef");
-
-        //var stubHandler = new Mock<HttpMessageHandler>();
-        //stubHandler.Protected()
-        //           .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
-        //        ItExpr.IsAny<CancellationToken>())
-        //           .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+        stubNonceGenerator.Setup(ng => ng.Generate(TestConstants.AppId)).Returns("abcdef");
 
         var host = new HostBuilder()
             .ConfigureServices(services =>
             {
                 services.Configure<HawkSettings>(options =>
                 {
-                    options.AuthId = "id123";
-                    options.AuthKey = "3@uo45er?";
+                    options.AuthId = TestConstants.AppId;
+                    options.AuthKey = TestConstants.AppKey;
                     options.TimeOffset = 0;
                     options.TimestampCalculator = stubTimestampCalculator.Object;
                     options.NonceGenerator = stubNonceGenerator.Object;

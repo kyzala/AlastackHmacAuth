@@ -26,7 +26,6 @@
 		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\samples\Sample.Common\Sample.Common.csproj" />
 	  <ProjectReference Include="..\..\src\Alastack.HmacAuth.AspNetCore\Alastack.HmacAuth.AspNetCore.csproj" />
 	</ItemGroup>
 

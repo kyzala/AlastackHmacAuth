@@ -2,7 +2,6 @@ using Alastack.HmacAuth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using Sample.Common;
 using System.Text;
 using Xunit.Abstractions;
 using static System.Net.Mime.MediaTypeNames;
@@ -63,21 +62,15 @@ public class HmacClientTests
         stubTimestampCalculator.Setup(tc => tc.Calculate(0)).Returns(1662118565);
 
         var stubNonceGenerator = new Mock<INonceGenerator>();
-        stubNonceGenerator.Setup(ng => ng.Generate("id123")).Returns("abcdef");
-
-        //var stubHandler = new Mock<HttpMessageHandler>();
-        //stubHandler.Protected()
-        //           .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
-        //        ItExpr.IsAny<CancellationToken>())
-        //           .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+        stubNonceGenerator.Setup(ng => ng.Generate(TestConstants.AppId)).Returns("abcdef");
 
         var host = new HostBuilder()
             .ConfigureServices(services =>
             {
                 services.Configure<HmacSettings>(options =>
                 {
-                    options.AppId = "id123";
-                    options.AppKey = "3@uo45er?";
+                    options.AppId = TestConstants.AppId;
+                    options.AppKey = TestConstants.AppKey;
                     options.TimeOffset = 0;
                     options.TimestampCalculator = stubTimestampCalculator.Object;
                     options.NonceGenerator = stubNonceGenerator.Object;
