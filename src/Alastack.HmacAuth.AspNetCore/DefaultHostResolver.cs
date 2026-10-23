@@ -20,7 +20,7 @@ public class DefaultHostResolver : IHostResolver
         if (hosts.Length > 0)
         {
             var hostArray = hosts[0].Split(':');
-            if (hostArray.Length == 2 && int.TryParse(hostArray[1], out var port))
+            if (hostArray.Length == 2 && int.TryParse(hostArray[1], out var port) && port is >= 0 and <= 65535)
             {
                 return new HostString(hostArray[0], port);
             }
