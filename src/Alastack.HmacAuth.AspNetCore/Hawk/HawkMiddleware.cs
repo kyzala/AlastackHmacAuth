@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace Alastack.HmacAuth.AspNetCore;
@@ -21,6 +21,8 @@ public class HawkMiddleware
     }
     /// <summary>
     /// Invokes the middleware performing authentication.
+    /// The response body is buffered only for requests authenticated with Hawk
+    /// and with server authorization enabled; other requests are passed through without buffering.
     /// </summary>
     /// <param name="context">The <see cref="HttpContext"/>.</param>
     /// <param name="optionsMonitor">Used for notifications when <see cref="HawkOptions"/> instances change.</param>
@@ -28,7 +30,9 @@ public class HawkMiddleware
     public async Task Invoke(HttpContext context, IOptionsMonitor<HawkOptions> optionsMonitor)
     {
         var options = optionsMonitor.Get(HawkDefaults.AuthenticationScheme);
-        if (options.EnableServerAuthorization)
+        if (options.EnableServerAuthorization
+            && context.Items.ContainsKey("hawk:credential")
+            && context.Items.ContainsKey("hawk:hawkData"))
         {
             var originalStream = context.Response.Body;
             try

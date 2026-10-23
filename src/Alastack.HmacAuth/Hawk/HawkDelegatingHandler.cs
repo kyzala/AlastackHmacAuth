@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Headers;
 
 namespace Alastack.HmacAuth;
@@ -176,7 +176,7 @@ public class HawkDelegatingHandler : DelegatingHandler
 
         var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
         var macNew = crypto.CalculateResponseMac(hawkData);
-        if (!mac.Equals(macNew, StringComparison.Ordinal))
+        if (!FixedTimeComparer.Equals(mac, macNew))
         {
             response.StatusCode = HttpStatusCode.Unauthorized;
             return;
@@ -185,7 +185,7 @@ public class HawkDelegatingHandler : DelegatingHandler
         {
             var payload = await response.Content.ReadAsStringAsync(cancellationToken);
             var payloadHash = crypto.CalculatePayloadHash(payload, response.Content.Headers.ContentType?.MediaType);
-            if (!hawkData.Hash.Equals(payloadHash, StringComparison.Ordinal))
+            if (!FixedTimeComparer.Equals(hawkData.Hash, payloadHash))
             {
                 response.StatusCode = HttpStatusCode.Unauthorized;
                 return;
@@ -226,7 +226,7 @@ public class HawkDelegatingHandler : DelegatingHandler
         {
             var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
             var tsmNew = crypto.CalculateTsMac(tsNew);
-            if (!tsm.Equals(tsmNew, StringComparison.Ordinal))
+            if (!FixedTimeComparer.Equals(tsm, tsmNew))
             {
                 throw new HawkTimestampException("Invalid server timestamp hash", tsNew);
             }

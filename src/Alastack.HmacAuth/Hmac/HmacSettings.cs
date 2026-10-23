@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth;
+namespace Alastack.HmacAuth;
 
 /// <summary>
 /// Hmac authentication settings for <see cref="HmacDelegatingHandler"/>.
@@ -21,9 +21,9 @@ public class HmacSettings
     public string HmacAlgorithm { get; set; } = "HMACSHA256";
 
     /// <summary>
-    /// The hash algorithm name. Defaults to <c>MD5</c>.
+    /// The hash algorithm name. Defaults to <c>SHA256</c>.
     /// </summary>
-    public string HashAlgorithm { get; set; } = "MD5";
+    public string HashAlgorithm { get; set; } = "SHA256";
 
     /// <summary>
     /// Whether to include the hash value of the Http request payload when sending the request.

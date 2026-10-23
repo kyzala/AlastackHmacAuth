@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
 /// In-memory and distributing implementation of <see cref="IDataCache"/>.
+/// If both caches are registered, the distributed cache takes precedence and the memory cache is ignored.
+/// All expiration is absolute (relative to now); entries are never prolonged by access.
 /// </summary>
 public class DataCache : IDataCache
 {
@@ -58,7 +60,7 @@ public class DataCache : IDataCache
     {
         if (_distributedCache != null)
         {
-            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(absoluteExpirationRelativeToNow);
+            var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(absoluteExpirationRelativeToNow);
             await _distributedCache.SetAsync(key, value, options, token);
         }
         else 

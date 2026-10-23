@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth.AspNetCore;
+namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
 /// Hmac authentication credential.
@@ -21,7 +21,7 @@ public class HmacCredential
     public string HmacAlgorithm { get; set; } = "HMACSHA256";
 
     /// <summary>
-    /// The hash algorithm name. Defaults to <c>MD5</c>.
+    /// The hash algorithm name. Defaults to <c>SHA256</c>.
     /// </summary>
-    public string HashAlgorithm { get; set; } = "MD5";
+    public string HashAlgorithm { get; set; } = "SHA256";
 }

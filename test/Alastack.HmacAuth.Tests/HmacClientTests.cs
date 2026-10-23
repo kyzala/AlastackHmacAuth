@@ -1,4 +1,4 @@
-﻿using Alastack.HmacAuth;
+using Alastack.HmacAuth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
@@ -19,7 +19,7 @@ public class HmacClientTests
     }
 
     [Theory]
-    [InlineData("Hmac id123:1662118565:abcdef:fDsO2Fhqs4wlQbdlQEUiz0zkv+257n1SwN76jDjy7lk=:megVFcCd4uYcboNPG8BqzQ==")]
+    [InlineData("Hmac id123:1662118565:abcdef:SXbE34WOCepEWy1iyAUfGNWykPiX8uIQtC8b5OXewzI=:rh/Kd6geqLVo72DNrR3ua64fqvcWzdyi9XULfNybbtQ=")]
     public async Task SendAsync_HmacClient_ValidateAuthenticationHeaderIncludePayloadHash(string expected)
     {
         Action<HmacSettings> configureOptions = options =>

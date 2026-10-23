@@ -1,4 +1,4 @@
-﻿using Alastack.HmacAuth;
+using Alastack.HmacAuth;
 using Alastack.HmacAuth.AspNetCore;
 using Alastack.HmacAuth.Credentials;
 using Microsoft.AspNetCore.Builder;
@@ -167,7 +167,7 @@ public class MiddlewareTests
     }
 
     [Theory]
-    [InlineData("Hmac id123:1662118565:abcdef:fDsO2Fhqs4wlQbdlQEUiz0zkv+257n1SwN76jDjy7lk=:megVFcCd4uYcboNPG8BqzQ==")]
+    [InlineData("Hmac id123:1662118565:abcdef:SXbE34WOCepEWy1iyAUfGNWykPiX8uIQtC8b5OXewzI=:rh/Kd6geqLVo72DNrR3ua64fqvcWzdyi9XULfNybbtQ=")]
     public async Task HandleAuthenticateAsync_HawkHandler_ValidateIncludePayloadHash(string authHeaderValue)
     {
         var host = await new HostBuilder()
