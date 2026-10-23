@@ -21,14 +21,14 @@ internal class Program
         if (Console.ReadKey().Key == ConsoleKey.M)
         {
             Console.WriteLine("\n=> Test hmac auth ...\n");
-            var host1 = CreateHmacAuthClientHost(new Uri("https://localhost:5001/"));
+            var host1 = CreateHmacAuthClientHost(new Uri("https://localhost:1080/"));
             var apiClient1 = host1.Services.GetRequiredService<IApiClient>();
             await ApiInvoke(apiClient1);
         }
         else
         {
             Console.WriteLine("\n=> Test hawk auth ...\n");
-            var host2 = CreateHawkAuthClientHost(new Uri("https://localhost:5001/"));
+            var host2 = CreateHawkAuthClientHost(new Uri("http://192.168.1.102:2080/"));
             var apiClient2 = host2.Services.GetRequiredService<IApiClient>();
             await ApiInvoke(apiClient2);
         }
@@ -85,6 +85,8 @@ internal class Program
 
     static async Task ApiInvoke(IApiClient apiClient)
     {
+        Console.WriteLine((await apiClient.DebugForwardedAsync()).ToString());
+
         await apiClient.CreateTodoItemAsync(new TodoItem { Id = 1, Name = "walk dog", IsComplete = true });
         await apiClient.UpdateTodoItemAsync(new TodoItem { Id = 1, Name = "feed fish", IsComplete = true });
         Print(await apiClient.GetTodoItemsAsync());

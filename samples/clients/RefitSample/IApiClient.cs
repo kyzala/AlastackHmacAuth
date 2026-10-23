@@ -19,4 +19,7 @@ public interface IApiClient
 
     [Delete("/api/TodoItems/{id}")]
     Task DeleteTodoItemAsync(long id);
+
+    [Get("/debug-forwarded")]
+    Task<object> DebugForwardedAsync();
 }
