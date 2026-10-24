@@ -75,11 +75,11 @@ internal class Program
                     });
                 if (useHmac)
                 {
-                    httpClientBuilder.AddHttpMessageHandler<DefaultHmacDelegatingHandler>();
+                    httpClientBuilder.AddHttpMessageHandler<OptionsHmacDelegatingHandler>();
                 }
                 else
                 {
-                    httpClientBuilder.AddHttpMessageHandler<InjectableHawkDelegatingHandler>();
+                    httpClientBuilder.AddHttpMessageHandler<OptionsHawkDelegatingHandler>();
                 }
             })
             .Build();

@@ -9,7 +9,7 @@ namespace Alastack.HmacAuth.Options;
 /// <summary>
 /// The <see cref="HawkDelegatingHandler"/> implementation that handles Hawk authentication for HTTP requests.
 /// </summary>
-public class InjectableHawkDelegatingHandler : HawkDelegatingHandler
+public class OptionsHawkDelegatingHandler : HawkDelegatingHandler
 {
     private readonly IOptionsMonitor<HawkSettings>? _optionsMonitor;
 
@@ -20,7 +20,7 @@ public class InjectableHawkDelegatingHandler : HawkDelegatingHandler
     /// Initializes a new instance of <see cref="HawkDelegatingHandler"/>.
     /// </summary>
     /// <param name="optionsMonitor">Used for notifications when <see cref="HawkSettings"/> instances change.</param>
-    public InjectableHawkDelegatingHandler(IOptionsMonitor<HawkSettings> optionsMonitor)
+    public OptionsHawkDelegatingHandler(IOptionsMonitor<HawkSettings> optionsMonitor)
     {
         _optionsMonitor = optionsMonitor;
     }

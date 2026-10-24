@@ -12,7 +12,7 @@ namespace Sample.Common;
 public static class SampleClientRegistration
 {
     /// <summary>
-    /// Registers <see cref="HmacSettings"/>, validation and <see cref="DefaultHmacDelegatingHandler"/>.
+    /// Registers <see cref="HmacSettings"/>, validation and <see cref="OptionsHmacDelegatingHandler"/>.
     /// The returned handler must still be attached to an HttpClient via
     /// <c>AddHttpMessageHandler&lt;InjectableHmacDelegatingHandler&gt;()</c>.
     /// </summary>
@@ -24,12 +24,12 @@ public static class SampleClientRegistration
             options.AppKey = SampleCredentials.AppKey;
         });
         services.AddSingleton<IValidateOptions<HmacSettings>, HmacConfigValidation>();
-        services.AddTransient<DefaultHmacDelegatingHandler>();
+        services.AddTransient<OptionsHmacDelegatingHandler>();
         return services;
     }
 
     /// <summary>
-    /// Registers <see cref="HawkSettings"/>, validation and <see cref="InjectableHawkDelegatingHandler"/>.
+    /// Registers <see cref="HawkSettings"/>, validation and <see cref="OptionsHawkDelegatingHandler"/>.
     /// </summary>
     public static IServiceCollection AddSampleHawkAuth(this IServiceCollection services)
     {
@@ -43,7 +43,7 @@ public static class SampleClientRegistration
             options.GetSpecificData = (request, settings) => Task.FromResult<string?>(SampleCredentials.HawkSpecificData);
         });
         services.AddSingleton<IValidateOptions<HawkSettings>, HawkConfigValidation>();
-        services.AddTransient<InjectableHawkDelegatingHandler>();
+        services.AddTransient<OptionsHawkDelegatingHandler>();
         return services;
     }
 }
