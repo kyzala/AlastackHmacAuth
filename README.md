@@ -44,7 +44,7 @@ var client = new HttpClient(authHandler, disposeHandler: false)
 };
 ```
 
-The following code snippet demonstrates creating a Hmac authentication client with dependency injection. It requires the `Alastack.HmacAuth.Options` package, which provides settings validation and the options-driven `OptionsHmacDelegatingHandler` (settings are resolved from `IOptionsMonitor<HmacSettings>`, so configuration changes are picked up at runtime).
+The following code snippet demonstrates creating a Hmac authentication client with dependency injection. It uses the `Alastack.HmacAuth.Options` project, which provides settings validation and the options-driven `OptionsHmacDelegatingHandler` (settings are resolved from `IOptionsMonitor<HmacSettings>`, so configuration changes are picked up at runtime). That project is not published to NuGet yet, so reference it as a project reference.
 
 ```csharp
 var host = new HostBuilder()
@@ -144,7 +144,7 @@ This repo builds the following packages.
 | Package                                 | Version                                                      | Description                                                  |
 | --------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Alastack.HmacAuth | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth)](https://www.nuget.org/packages/Alastack.HmacAuth) | Hmac and Hawk authentication client.|
-| Alastack.HmacAuth.Options | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.Options)](https://www.nuget.org/packages/Alastack.HmacAuth.Options) | Options-driven client handlers (`OptionsHmacDelegatingHandler`, `OptionsHawkDelegatingHandler`) and settings validation.|
+| Alastack.HmacAuth.Options | Not published yet | Options-driven client handlers (`OptionsHmacDelegatingHandler`, `OptionsHawkDelegatingHandler`) and settings validation. |
 | Alastack.HmacAuth.AspNetCore | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.AspNetCore)](https://www.nuget.org/packages/Alastack.HmacAuth.AspNetCore) | Hmac and Hawk authentication for ASP.NET Core.|
 | Alastack.HmacAuth.Sql             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.Sql)](https://www.nuget.org/packages/Alastack.HmacAuth.Sql) | Sql CredentialProvider.                   |
 | Alastack.HmacAuth.MongoDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.MongoDB)](https://www.nuget.org/packages/Alastack.HmacAuth.MongoDB) | MongoDB CredentialProvider.                   |

@@ -40,7 +40,7 @@ services.AddRefitClient<IApiClient>()
         .AddHttpMessageHandler(_ => new HmacDelegatingHandler("appId", "appKey"));
 ```
 
-To drive the handlers from `IOptionsMonitor<T>` instead of literal credentials (configuration hot-reload, named options, settings validation), use the `Alastack.HmacAuth.Options` package, which provides `OptionsHmacDelegatingHandler` / `OptionsHawkDelegatingHandler`.
+To drive the handlers from `IOptionsMonitor<T>` instead of literal credentials (configuration hot-reload, named options, settings validation), use `OptionsHmacDelegatingHandler` / `OptionsHawkDelegatingHandler` from the `Alastack.HmacAuth.Options` project in this repository. That project is not published to NuGet yet, so it has to be referenced as a project reference.
 
 The handler adds an `Authorization` header to every request:
 
