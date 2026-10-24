@@ -3,7 +3,6 @@
 	<TargetFrameworks>net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <InvariantGlobalization>true</InvariantGlobalization>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<Authors>kyzala</Authors>
 	<Copyright>Copyright © 2026 kyzala</Copyright>
