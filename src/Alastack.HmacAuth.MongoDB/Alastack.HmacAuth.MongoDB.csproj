@@ -2,7 +2,7 @@
 
   <PropertyGroup>	
 	<Version>2.2.0</Version>
-	<PackageTags>Alastack;Auth;Authentication;Hmac;Hawk;MongoDB</PackageTags>
+	<PackageTags>authentication;security;hmac;hawk;mongodb</PackageTags>
 	<Description>A MongoDB CredentialProvider supports Hmac and Hawk authentication.</Description>
   </PropertyGroup>
 

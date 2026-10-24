@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	<Version>2.2.0</Version>
-	<PackageTags>Alastack;Auth;Authentication;Hmac;Hawk;EntityFrameworkCore;EFCore</PackageTags>
+	<PackageTags>authentication;security;hmac;hawk;EntityFrameworkCore;EFCore;EF</PackageTags>
 	<Description>A EntityFrameworkCore CredentialProvider supports Hmac and Hawk authentication.</Description>
   </PropertyGroup>
 
