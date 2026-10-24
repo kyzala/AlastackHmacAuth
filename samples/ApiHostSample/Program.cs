@@ -44,9 +44,9 @@ public class Program
             {
                 var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
                 if (authHeader?.StartsWith("Hmac ") == true)
-                    return "Hmac";
+                    return HmacDefaults.AuthenticationScheme;
                 if (authHeader?.StartsWith("Hawk ") == true)
-                    return "Hawk";
+                    return HawkDefaults.AuthenticationScheme;
                 return null; // Return the default challenge scheme
             };
         })

@@ -1,7 +1,7 @@
 ﻿using Refit;
 using Sample.Common;
 
-namespace RefitSample;
+namespace ClientRefitSample;
 
 public interface IApiClient
 {
