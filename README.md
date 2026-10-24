@@ -44,7 +44,7 @@ var client = new HttpClient(authHandler, disposeHandler: false)
 };
 ```
 
-The following code snippet demonstrates creating a Hmac authentication client with dependency injection.
+The following code snippet demonstrates creating a Hmac authentication client with dependency injection. It requires the `Alastack.HmacAuth.Options` package, which provides settings validation and the options-driven `OptionsHmacDelegatingHandler` (settings are resolved from `IOptionsMonitor<HmacSettings>`, so configuration changes are picked up at runtime).
 
 ```csharp
 var host = new HostBuilder()
@@ -56,10 +56,10 @@ var host = new HostBuilder()
         options.AppKey = "appKey";
     });
     services.AddSingleton<IValidateOptions<HmacSettings>, HmacConfigValidation>();
-    services.AddTransient<InjectableHmacDelegatingHandler>();
-    services.AddHttpClient<ApiClient>("ApiClient", httpClient => 
-        httpClient.BaseAddress = "https://localhost:5001/")
-    .AddHttpMessageHandler<InjectableHmacDelegatingHandler>();
+    services.AddTransient<OptionsHmacDelegatingHandler>();
+    services.AddHttpClient<ApiClient>("ApiClient", httpClient =>
+        httpClient.BaseAddress = new Uri("https://localhost:5001/"))
+    .AddHttpMessageHandler<OptionsHmacDelegatingHandler>();
 }).Build();
 var apiClient = host.Services.GetRequiredService<ApiClient>();
 await apiClient.CreateTodoItemAsync(new TodoItem { Name = "walk dog" });
@@ -104,7 +104,7 @@ var client = new HttpClient(authHandler, disposeHandler: false)
 };
 ```
 
-The following code snippet demonstrates creating a Hawk authentication client with dependency injection.
+The following code snippet demonstrates creating a Hawk authentication client with dependency injection. Like the Hmac example, it uses the `Alastack.HmacAuth.Options` package.
 
 ```csharp
 var host = new HostBuilder()
@@ -116,10 +116,10 @@ var host = new HostBuilder()
         options.AuthKey = "authKey";
     });
     services.AddSingleton<IValidateOptions<HawkSettings>, HawkConfigValidation>();
-    services.AddTransient<InjectableHawkDelegatingHandler>();
-    services.AddHttpClient<ApiClient>("ApiClient", httpClient => 
-        httpClient.BaseAddress = "https://localhost:5001/")
-    .AddHttpMessageHandler<InjectableHawkDelegatingHandler>();
+    services.AddTransient<OptionsHawkDelegatingHandler>();
+    services.AddHttpClient<ApiClient>("ApiClient", httpClient =>
+        httpClient.BaseAddress = new Uri("https://localhost:5001/"))
+    .AddHttpMessageHandler<OptionsHawkDelegatingHandler>();
 }).Build();
 var apiClient = host.Services.GetRequiredService<ApiClient>();
 await apiClient.CreateTodoItemAsync(new TodoItem { Name = "walk dog" });
@@ -144,10 +144,12 @@ This repo builds the following packages.
 | Package                                 | Version                                                      | Description                                                  |
 | --------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Alastack.HmacAuth | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth)](https://www.nuget.org/packages/Alastack.HmacAuth) | Hmac and Hawk authentication client.|
+| Alastack.HmacAuth.Options | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.Options)](https://www.nuget.org/packages/Alastack.HmacAuth.Options) | Options-driven client handlers (`OptionsHmacDelegatingHandler`, `OptionsHawkDelegatingHandler`) and settings validation.|
 | Alastack.HmacAuth.AspNetCore | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.AspNetCore)](https://www.nuget.org/packages/Alastack.HmacAuth.AspNetCore) | Hmac and Hawk authentication for ASP.NET Core.|
 | Alastack.HmacAuth.Sql             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.Sql)](https://www.nuget.org/packages/Alastack.HmacAuth.Sql) | Sql CredentialProvider.                   |
 | Alastack.HmacAuth.MongoDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.MongoDB)](https://www.nuget.org/packages/Alastack.HmacAuth.MongoDB) | MongoDB CredentialProvider.                   |
 | Alastack.HmacAuth.LiteDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.LiteDB)](https://www.nuget.org/packages/Alastack.HmacAuth.LiteDB) | LiteDB CredentialProvider.                   |
+| Alastack.HmacAuth.EFCore             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.EFCore)](https://www.nuget.org/packages/Alastack.HmacAuth.EFCore) | EntityFrameworkCore CredentialProvider.                   |
 
 ## Configure Authentication
 
@@ -274,3 +276,12 @@ A data cache abstraction. `DataCache` integrates in-memory and distributing cach
 ## Samples
 
 Visit the [samples](https://github.com/kyzala/AlastackHmacAuth/tree/main/samples) folder.
+
+- **ApiHostSample** — ASP.NET Core host with Hmac and Hawk authentication, including a `/debug-forwarded` endpoint for inspecting forwarding headers.
+- **ApiProxy** — a YARP-based proxy chain used to test host resolution behind reverse proxies.
+- **ClientBasicSample** — raw `HttpClient` client with an interactive console menu (no DI).
+- **ClientHostSample** — `IHttpClientFactory`-based client with an interactive console menu.
+- **ClientRefitSample** — [Refit](https://github.com/reactiveui/refit)-based client with an interactive console menu.
+- **Sql / MongoDB / LiteDB / EFCore credential samples** — ASP.NET Core hosts backed by the corresponding credential provider packages.
+
+The client samples share credentials and registration helpers from `samples/Sample.Common`; run `ApiHostSample` first, then pick an authentication scheme and operation from the client menu.

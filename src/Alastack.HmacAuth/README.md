@@ -40,10 +40,12 @@ services.AddRefitClient<IApiClient>()
         .AddHttpMessageHandler(_ => new HmacDelegatingHandler("appId", "appKey"));
 ```
 
+To drive the handlers from `IOptionsMonitor<T>` instead of literal credentials (configuration hot-reload, named options, settings validation), use the `Alastack.HmacAuth.Options` package, which provides `OptionsHmacDelegatingHandler` / `OptionsHawkDelegatingHandler`.
+
 The handler adds an `Authorization` header to every request:
 
 ```http
-Authorization: Hmac {appId}:{timestamp}:{nonce}:{payloadHash}:{signature}
+Authorization: Hmac {appId}:{timestamp}:{nonce}:{signature}:{payloadHash}
 ```
 
 `signature` is the Base64 HMAC of `appId`, `timestamp`, `nonce`, `method`, `resource` (path + query), `host`, `port` and `payloadHash`, so the server also authenticates the exact URL and body you sent.

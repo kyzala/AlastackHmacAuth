@@ -97,6 +97,7 @@ Every request carries a timestamp and a nonce. Authenticated nonces are stored i
 | `TimeSkew` | `300` (s) | Allowed clock skew between client and server. |
 | `CredentialCacheTime` | `300` (s) | How long credentials are cached; `0` disables caching. |
 | `TimeOffset` | `0` (ms) | Server clock offset **in milliseconds**. |
+| `DisableChallenge` | `true` | By default no `WWW-Authenticate` challenge is written on failure. Set to `false` to return one (e.g. `Stale timestamp.`, or a Hawk challenge carrying `ts`/`tsm` for client clock sync) — useful for debugging and client time correction. |
 
 ## Running behind reverse proxies
 
