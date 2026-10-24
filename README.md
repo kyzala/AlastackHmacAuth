@@ -104,7 +104,7 @@ var client = new HttpClient(authHandler, disposeHandler: false)
 };
 ```
 
-The following code snippet demonstrates creating a Hawk authentication client with dependency injection. Like the Hmac example, it uses the `Alastack.HmacAuth.Options` package.
+The following code snippet demonstrates creating a Hawk authentication client with dependency injection. Like the Hmac example, it uses the `OptionsHawkDelegatingHandler` from the `Alastack.HmacAuth.Options` project.
 
 ```csharp
 var host = new HostBuilder()
@@ -144,7 +144,6 @@ This repo builds the following packages.
 | Package                                 | Version                                                      | Description                                                  |
 | --------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Alastack.HmacAuth | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth)](https://www.nuget.org/packages/Alastack.HmacAuth) | Hmac and Hawk authentication client.|
-| Alastack.HmacAuth.Options | Not published yet | Options-driven client handlers (`OptionsHmacDelegatingHandler`, `OptionsHawkDelegatingHandler`) and settings validation. |
 | Alastack.HmacAuth.AspNetCore | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.AspNetCore)](https://www.nuget.org/packages/Alastack.HmacAuth.AspNetCore) | Hmac and Hawk authentication for ASP.NET Core.|
 | Alastack.HmacAuth.Sql             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.Sql)](https://www.nuget.org/packages/Alastack.HmacAuth.Sql) | Sql CredentialProvider.                   |
 | Alastack.HmacAuth.MongoDB             | [![Nuget](https://img.shields.io/nuget/v/Alastack.HmacAuth.MongoDB)](https://www.nuget.org/packages/Alastack.HmacAuth.MongoDB) | MongoDB CredentialProvider.                   |
@@ -201,7 +200,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 ```
 
-If you register it, configure `KnownProxies`/`KnownNetworks` so that only trusted proxies can rewrite `HttpRequest.Host`; entries from untrusted sources are ignored.
+If you register it, configure `KnownProxies`/`KnownIPNetworks` so that only trusted proxies can rewrite `HttpRequest.Host`; entries from untrusted sources are ignored. (`KnownNetworks` is obsolete since .NET 8.)
 
 **Example 1: trust specific proxy IP addresses** (`KnownProxies`)
 
@@ -215,13 +214,13 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardLimit = 2,
     KnownProxies =
     {
-        IPAddress.Parse("10.0.0.10"), // nginx ingress
-        IPAddress.Parse("10.0.0.11")  // api gateway
+        IPAddress.Parse("192.168.1.102"), // nginx ingress
+        IPAddress.Parse("192.168.1.103")  // api gateway
     }
 });
 ```
 
-**Example 2: trust a proxy subnet** (`KnownNetworks`)
+**Example 2: trust a proxy subnet** (`KnownIPNetworks`)
 
 ```csharp
 using System.Net;
@@ -231,12 +230,14 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
     ForwardLimit = 2,
-    KnownNetworks =
+    KnownIPNetworks =
     {
-        new IPNetwork(IPAddress.Parse("10.0.0.0"), 8) // trust the whole internal proxy subnet
+        new System.Net.IPNetwork(IPAddress.Parse("192.168.1.0"), 24) // trust the demo proxy subnet
     }
 });
 ```
+
+`KnownIPNetworks` takes `System.Net.IPNetwork`, which replaces the obsolete `KnownNetworks` / `Microsoft.AspNetCore.HttpOverrides.IPNetwork` pair. The type is fully qualified above because `Microsoft.AspNetCore.HttpOverrides` still exposes an obsolete `IPNetwork`, which would otherwise make the name ambiguous.
 
 **Example 3: cloud/container environments** (e.g. Kubernetes, Azure App Service) where proxy IPs are dynamic — trust all networks. This is safe only when the app is unreachable directly from the internet and all traffic must pass through the ingress/load balancer:
 
@@ -249,13 +250,13 @@ var options = new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
     ForwardLimit = 5
 };
-options.KnownNetworks.Clear();
+options.KnownIPNetworks.Clear();
 options.KnownProxies.Clear();
-options.KnownNetworks.Add(new IPNetwork(IPAddress.Any, 0)); // trust any proxy
+options.KnownIPNetworks.Add(new System.Net.IPNetwork(IPAddress.Any, 0)); // trust any proxy
 app.UseForwardedHeaders(options);
 ```
 
-> **Warning**: without `KnownProxies`/`KnownNetworks` restrictions, or when trusting all networks while the app is directly reachable, a client can forge `X-Forwarded-Host` and change `HttpRequest.Host` for the rest of the pipeline. To keep legitimate HMAC/Hawk requests working, the leftmost `X-Forwarded-Host` entry must match the host the client signed; always lock down which proxies are trusted.
+> **Warning**: without `KnownProxies`/`KnownIPNetworks` restrictions, or when trusting all networks while the app is directly reachable, a client can forge `X-Forwarded-Host` and change `HttpRequest.Host` for the rest of the pipeline. To keep legitimate HMAC/Hawk requests working, the leftmost `X-Forwarded-Host` entry must match the host the client signed; always lock down which proxies are trusted.
 
 - **`IReplayRequestValidator`**
 

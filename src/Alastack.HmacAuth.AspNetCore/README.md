@@ -106,13 +106,26 @@ The request host is part of the signature, so the server must know the host the 
 If other application code also depends on `Request.Host`/`Request.Scheme`, register the ASP.NET Core Forwarded Headers Middleware and restrict which proxies are trusted:
 
 ```csharp
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
+
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
     ForwardLimit = 5,
-    KnownProxies = { IPAddress.Parse("10.0.0.10") }
+    KnownProxies =
+    {
+        IPAddress.Parse("192.168.1.102"),
+        IPAddress.Parse("192.168.1.103")
+    }
 });
-// before app.UseAuthentication();
+// register before app.UseAuthentication();
+```
+
+To trust a whole proxy subnet instead, use `KnownIPNetworks` with `System.Net.IPNetwork` (`KnownNetworks` is obsolete since .NET 8):
+
+```csharp
+options.KnownIPNetworks.Add(new System.Net.IPNetwork(IPAddress.Parse("192.168.1.0"), 24));
 ```
 
 Custom host resolution: implement `IHostResolver` and assign it to `HmacOptions.HostResolver` / `HawkOptions.HostResolver`.
