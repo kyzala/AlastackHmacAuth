@@ -31,7 +31,9 @@ dotnet add package Alastack.HmacAuth
 dotnet add package Alastack.HmacAuth.AspNetCore
 ```
 
-Client — sign outgoing requests:
+### Hmac
+
+**Client**
 
 ```csharp
 var client = new HttpClient(new HmacDelegatingHandler("appId", "appKey"))
@@ -40,7 +42,7 @@ var client = new HttpClient(new HmacDelegatingHandler("appId", "appKey"))
 };
 ```
 
-Server — authenticate incoming requests:
+**Server**
 
 ```csharp
 builder.Services.AddAuthentication()
@@ -55,9 +57,41 @@ builder.Services.AddAuthentication()
 
 var app = builder.Build();
 app.UseAuthentication();
-app.UseHawkServerAuthorization(); // Hawk response signing only
 app.UseAuthorization();
 ```
+
+Endpoints opt in with `[Authorize(AuthenticationSchemes = "Hmac")]`.
+
+### Hawk
+
+**Client**
+
+```csharp
+var client = new HttpClient(new HawkDelegatingHandler("authId", "authKey"))
+{
+    BaseAddress = new Uri("https://localhost:5001/")
+};
+```
+
+**Server**
+
+```csharp
+builder.Services.AddAuthentication()
+    .AddHawk(options =>
+    {
+        options.CredentialProvider = new MemoryCredentialProvider<HawkCredential>(
+            new Dictionary<string, HawkCredential>
+            {
+                ["authId"] = new HawkCredential { AuthId = "authId", AuthKey = "authKey" }
+            });
+    });
+
+var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
+Endpoints opt in with `[Authorize(AuthenticationSchemes = "Hawk")]`. To sign responses as well, set `EnableServerAuthorization = true` in `AddHawk` and register `app.UseHawkServerAuthorization()` right after `UseAuthentication()`.
 
 ## How it works
 
