@@ -4,11 +4,6 @@
 	<Version>2.3.0</Version>	
 	<PackageTags>authentication;security;hmac;hawk</PackageTags>
 	<Description>A .NET API supports Hmac and Hawk authentication.</Description>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
-  <ItemGroup>
-	<None Include="README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
 
 </Project>

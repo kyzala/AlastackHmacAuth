@@ -7,6 +7,7 @@
 	<Authors>kyzala</Authors>
 	<Copyright>Copyright © 2026 kyzala</Copyright>
 	<PackageIcon>icon.png</PackageIcon>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageProjectUrl>https://github.com/kyzala/AlastackHmacAuth</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/kyzala/AlastackHmacAuth</RepositoryUrl>
@@ -18,5 +19,6 @@
 
   <ItemGroup>
 	<None Include="..\..\icon.png" Pack="true" PackagePath="\" Visible="False" />
+	<None Include="$(MSBuildThisFileDirectory)src/README.md" Pack="true" PackagePath="\" Visible="False" />
   </ItemGroup>
 </Project>
