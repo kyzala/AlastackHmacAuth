@@ -46,22 +46,22 @@ public class DataCache : IDataCache
     }
 
     /// <inheritdoc />
-    public async Task<byte[]?> GetAsync(string key, CancellationToken token = default)
+    public async Task<byte[]?> GetAsync(string key, CancellationToken cancellationToken = default)
     {
         if (_distributedCache != null)
         {
-            return await _distributedCache.GetAsync(key, token).ConfigureAwait(false);
+            return await _distributedCache.GetAsync(key, cancellationToken).ConfigureAwait(false);
         }
         return _memoryCache!.Get<byte[]?>(key);
     }
 
     /// <inheritdoc />
-    public async Task SetAsync(string key, byte[] value, TimeSpan absoluteExpirationRelativeToNow, CancellationToken token = default)
+    public async Task SetAsync(string key, byte[] value, TimeSpan absoluteExpirationRelativeToNow, CancellationToken cancellationToken = default)
     {
         if (_distributedCache != null)
         {
             var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(absoluteExpirationRelativeToNow);
-            await _distributedCache.SetAsync(key, value, options, token);
+            await _distributedCache.SetAsync(key, value, options, cancellationToken);
         }
         else 
         {

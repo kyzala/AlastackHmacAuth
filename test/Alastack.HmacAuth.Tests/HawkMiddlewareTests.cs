@@ -18,7 +18,7 @@ public class HawkMiddlewareTests
     [InlineData("Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", hash=\"MfdKig8i5ykUIFjQkiIfmdJ0eKx5nWatljTRy2hIYkc=\", ext=\"extdata\", mac=\"kCVNXF0ki+2AcM8gf0BE3m7ShsvAghExAKjh2qMIjjc=\"")]
     [InlineData("Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", hash=\"MfdKig8i5ykUIFjQkiIfmdJ0eKx5nWatljTRy2hIYkc=\", ext=\"extdata\", mac=\"cNX1z5hywwV4Zeoejp81APyxPGvAst8zDbjy8uiK2f4=\", app=\"abc\", dlg=\"\"")]
     [InlineData("Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", hash=\"MfdKig8i5ykUIFjQkiIfmdJ0eKx5nWatljTRy2hIYkc=\", ext=\"extdata\", mac=\"O4MnqtWlnXVgS4QJNuVf2iB4XiV6uGlGIi0eU9eSrUA=\", app=\"abc\", dlg=\"123\"")]
-    public async Task HandleAuthenticateAsync_HawkHandler_ValidateIncludePayloadHash(string authHeaderValue)
+    public async Task HandleAuthenticateAsync_HawkHandler_WithPayloadHash_Authenticates(string authHeaderValue)
     {
         using var host = await new HostBuilder()
             .ConfigureWebHost(builder => ConfigureWebHost(builder))
@@ -49,7 +49,7 @@ public class HawkMiddlewareTests
     [InlineData("Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", ext=\"extdata\", mac=\"jFFBjfNU18hdXCIeB/EQ+xe3ZhL0qF5ZsD+kjVMlxh0=\"")]
     [InlineData("Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", ext=\"extdata\", mac=\"QzHSDcM4mGppdrIKF5GAF/0vqJ05EC2Jw66R4C7rldg=\", app=\"abc\", dlg=\"\"")]
     [InlineData("Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", ext=\"extdata\", mac=\"ur1ZDiYXrFtrG80WS3WJI7Kz2aBl9egyD6ZEasQxCD8=\", app=\"abc\", dlg=\"123\"")]
-    public async Task HandleAuthenticateAsync_HawkHandler_ValidateExcludePayloadHash(string authHeaderValue)
+    public async Task HandleAuthenticateAsync_HawkHandler_WithoutPayloadHash_Authenticates(string authHeaderValue)
     {
         using var host = await new HostBuilder()
             .ConfigureWebHost(builder => ConfigureWebHost(builder))

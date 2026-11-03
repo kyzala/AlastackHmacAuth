@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth.AspNetCore;
+namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
 /// The default implementation of <see cref="IReplayRequestValidator"/>.
@@ -17,19 +17,19 @@ public class ReplayRequestValidator : IReplayRequestValidator
     }
 
     /// <inheritdoc />
-    public async Task<bool> ValidateAsync(string id, string nonce, long timestamp, long maxReplayRequestAge, CancellationToken token = default)
+    public async Task<bool> ValidateAsync(string id, string nonce, long timestamp, long maxReplayRequestAge, CancellationToken cancellationToken = default)
     {
         if (maxReplayRequestAge == 0)
         {
             return false;
         }
-        var val = await _dataCache.GetAsync(id, token);
+        var val = await _dataCache.GetAsync(id, cancellationToken);
         if (val != null)
         {
             return true;
         }
         //var data = Encoding.UTF8.GetBytes(timestamp.ToString());
-        await _dataCache.SetStringAsync(id, timestamp.ToString(), TimeSpan.FromSeconds(maxReplayRequestAge), token);
+        await _dataCache.SetStringAsync(id, timestamp.ToString(), TimeSpan.FromSeconds(maxReplayRequestAge), cancellationToken);
         return false;
     }
 }

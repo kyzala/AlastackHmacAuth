@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth;
+namespace Alastack.HmacAuth;
 
 /// <summary>
 /// Class used to validate <see cref="HmacSettings" /> instance.
@@ -6,31 +6,31 @@
 public class HmacConfigValidator : IConfigValidator<HmacSettings>
 {
     /// <inheritdoc />
-    public ValidateConfigResult Validate(HmacSettings options)
+    public ConfigValidationResult Validate(HmacSettings options)
     {
-        string? vor = null;
+        string? validationMessage = null;
         if (String.IsNullOrWhiteSpace(options.AppId))
         {
-            vor = $"{nameof(options.AppId)} must not be null or whitespace.";
+            validationMessage = $"{nameof(options.AppId)} must not be null or whitespace.";
         }
         if (String.IsNullOrWhiteSpace(options.AppKey))
         {
-            vor += $"{nameof(options.AppKey)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.AppKey)} must not be null or whitespace.";
         }
         if (String.IsNullOrWhiteSpace(options.HmacAlgorithm))
         {
-            vor += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
         }
         if (String.IsNullOrWhiteSpace(options.HmacAlgorithm))
         {
-            vor += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
         }
 
-        if (vor != null)
+        if (validationMessage != null)
         {
-            return ValidateConfigResult.Fail(vor);
+            return ConfigValidationResult.Fail(validationMessage);
         }
 
-        return ValidateConfigResult.Success;
+        return ConfigValidationResult.Success;
     }
 }

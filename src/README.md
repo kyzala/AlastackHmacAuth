@@ -45,12 +45,12 @@ var handler = new HawkDelegatingHandler(new HawkSettings
 {
     AuthId = "authId",
     AuthKey = "authKey",
-    EnableServerAuthorizationValidation = true, // verify Server-Authorization
-    EnableServerTimeValidation = true           // verify tsm, then adjust TimeOffset
+    ValidateServerAuthorization = true, // verify Server-Authorization
+    ValidateServerTime = true           // verify tsm, then adjust TimeOffsetSeconds
 });
 ```
 
-The Hmac `Authorization` header is `Hmac {appId}:{timestamp}:{nonce}:{signature}:{payloadHash}`. Both handlers accept a settings object (`HmacSettings` / `HawkSettings`); the important ones are the id/key pair, `HashAlgorithm` (default `SHA256`, must match the server), `IncludePayloadHash` (default `true`) and `TimeOffset` (**seconds**) for a skewed clock.
+The Hmac `Authorization` header is `Hmac {appId}:{timestamp}:{nonce}:{signature}:{payloadHash}`. Both handlers accept a settings object (`HmacSettings` / `HawkSettings`); the important ones are the id/key pair, `HashAlgorithm` (default `SHA256`, must match the server), `IncludePayloadHash` (default `true`) and `TimeOffsetSeconds` for a skewed clock.
 
 ## Server
 
@@ -82,7 +82,7 @@ app.UseAuthorization();
 
 Then protect endpoints with the scheme: `[Authorize(AuthenticationSchemes = "Hmac")]` (or `"Hawk"`).
 
-Replay protection is on by default: a nonce is remembered for `MaxReplayRequestAge` (60 s) and clock skew is limited to `TimeSkew` (300 s). `CredentialCacheTime` (300 s, `0` disables caching) controls credential caching, `TimeOffset` (**milliseconds**) corrects the server clock, and `DisableChallenge` (`true`) suppresses `WWW-Authenticate` responses on failure.
+Replay protection is on by default: a nonce is remembered for `MaxReplayRequestAge` (60 s) and clock skew is limited to `TimeSkew` (300 s). `CredentialCacheTime` (300 s, `0` disables caching) controls credential caching, `TimeOffsetMilliseconds` corrects the server clock, and `EnableChallenge` (`false` by default) emits a `WWW-Authenticate` header on failure.
 
 ## Credential stores
 
@@ -131,6 +131,12 @@ Use `KnownIPNetworks` with `System.Net.IPNetwork` to trust a subnet (`KnownNetwo
 - Default `HashAlgorithm` changed from `MD5` to `SHA256`. Upgrade client and server together, or set `HashAlgorithm = "MD5"` explicitly.
 - `IHostResolver.Resolve` is now `Resolve(HttpRequest request)`; `ForwardIndex` was removed from `HmacOptions` and `HawkOptions`.
 - MAC/signature comparisons are now constant-time.
+- Renamed for consistency: `DataCacheExtentions` → `DataCacheExtensions`, `HawkMiddlewareExtentions` → `HawkMiddlewareExtensions`, `ValidateConfigResult` → `ConfigValidationResult`, and `HmacConfigValidation` / `HawkConfigValidation` → `HmacOptionsValidator` / `HawkOptionsValidator`.
+- `TimeOffset` is split into `TimeOffsetSeconds` (client settings) and `TimeOffsetMilliseconds` (server options).
+- `DisableChallenge` became `EnableChallenge` (default `false`, so behavior is unchanged).
+- Client flags `EnableServerAuthorizationValidation` / `EnableServerTimeValidation` became `ValidateServerAuthorization` / `ValidateServerTime`.
+- `HawkCredential.HmacAlgorithm` and `HawkSettings.HmacAlgorithm` became `MacAlgorithm`, matching Hawk's `algorithm` field. Rename the matching column/field in your credential store, or alias it in the query (`SELECT ..., HmacAlgorithm AS MacAlgorithm ...`).
+- `CancellationToken` parameters named `token` are now `cancellationToken`.
 
 ## Samples
 

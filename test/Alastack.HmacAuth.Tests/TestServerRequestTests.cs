@@ -16,7 +16,7 @@ namespace Alastack.HmacAuth.Tests;
 public class TestServerRequestTests
 {
     [Fact]
-    public async Task Validate_RequestParameters_UsingNormalPort()
+    public async Task SendAsync_RequestParameters_UsingNormalPort()
     {
         using var host = await CreateHostAsync();
         var server = host.GetTestServer();
@@ -42,7 +42,7 @@ public class TestServerRequestTests
     }
 
     [Fact]
-    public async Task Validate_RequestParameters_UsingSpecificPort()
+    public async Task SendAsync_RequestParameters_UsingSpecificPort()
     {
         using var host = await CreateHostAsync();
         var server = host.GetTestServer();
@@ -64,7 +64,7 @@ public class TestServerRequestTests
     }
 
     [Fact]
-    public async Task Validate_RequestParameters_WithPathBase()
+    public async Task SendAsync_RequestParameters_WithPathBase()
     {
         using var host = await CreateHostAsync();
         var server = host.GetTestServer();
@@ -85,7 +85,7 @@ public class TestServerRequestTests
     }
 
     [Fact]
-    public async Task Validate_RequestParameters_WithoutPathBase()
+    public async Task SendAsync_RequestParameters_WithoutPathBase()
     {
         using var host = await CreateHostAsync();
         var server = host.GetTestServer();
@@ -103,7 +103,7 @@ public class TestServerRequestTests
     }
 
     [Fact]
-    public async Task Validate_RequestParameters_WithContentType()
+    public async Task SendAsync_RequestParameters_WithContentType()
     {
         using var host = await CreateHostAsync();
         var server = host.GetTestServer();
@@ -122,7 +122,7 @@ public class TestServerRequestTests
     }
 
     [Fact]
-    public async Task Validate_RequestParameters_WithoutContentType()
+    public async Task SendAsync_RequestParameters_WithoutContentType()
     {
         using var host = await CreateHostAsync();
         var server = host.GetTestServer();

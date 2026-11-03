@@ -40,7 +40,7 @@ public class HmacHandlerNegativeTests
                 services.AddAuthentication(options => options.DefaultScheme = HmacDefaults.AuthenticationScheme)
                     .AddHmac(options =>
                     {
-                        options.DisableChallenge = false; // emit the WWW-Authenticate challenge header
+                        options.EnableChallenge = true; // emit the WWW-Authenticate challenge header
                         options.CredentialProvider = new MemoryCredentialProvider<HmacCredential>(
                             new Dictionary<string, HmacCredential> { [Credential.AppId] = Credential });
                     });

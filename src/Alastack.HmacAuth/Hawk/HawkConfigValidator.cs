@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth;
+namespace Alastack.HmacAuth;
 
 /// <summary>
 /// Class used to validate <see cref="HawkSettings" /> instance.
@@ -6,31 +6,31 @@
 public class HawkConfigValidator : IConfigValidator<HawkSettings>
 {
     /// <inheritdoc />
-    public ValidateConfigResult Validate(HawkSettings options)
+    public ConfigValidationResult Validate(HawkSettings options)
     {
-        string? vor = null;
+        string? validationMessage = null;
         if (String.IsNullOrWhiteSpace(options.AuthId))
         {
-            vor = $"{nameof(options.AuthId)} must not be null or whitespace.";
+            validationMessage = $"{nameof(options.AuthId)} must not be null or whitespace.";
         }
         if (String.IsNullOrWhiteSpace(options.AuthKey))
         {
-            vor += $"{nameof(options.AuthKey)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.AuthKey)} must not be null or whitespace.";
         }
-        if (String.IsNullOrWhiteSpace(options.HmacAlgorithm))
+        if (String.IsNullOrWhiteSpace(options.MacAlgorithm))
         {
-            vor += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.MacAlgorithm)} must not be null or whitespace.";
         }
-        if (String.IsNullOrWhiteSpace(options.HmacAlgorithm))
+        if (String.IsNullOrWhiteSpace(options.MacAlgorithm))
         {
-            vor += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.MacAlgorithm)} must not be null or whitespace.";
         }
 
-        if (vor != null)
+        if (validationMessage != null)
         {
-            return ValidateConfigResult.Fail(vor);
+            return ConfigValidationResult.Fail(validationMessage);
         }
 
-        return ValidateConfigResult.Success;
+        return ConfigValidationResult.Success;
     }
 }

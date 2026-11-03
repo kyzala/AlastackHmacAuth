@@ -19,7 +19,7 @@ public class HmacClientTests
 
     [Theory]
     [InlineData("Hmac id123:1662118565:abcdef:SXbE34WOCepEWy1iyAUfGNWykPiX8uIQtC8b5OXewzI=:rh/Kd6geqLVo72DNrR3ua64fqvcWzdyi9XULfNybbtQ=")]
-    public async Task SendAsync_HmacClient_ValidateAuthenticationHeaderIncludePayloadHash(string expected)
+    public async Task SendAsync_HmacClient_WithPayloadHash_SetsExpectedAuthorizationHeader(string expected)
     {
         Action<HmacSettings> configureOptions = options =>
         {
@@ -41,7 +41,7 @@ public class HmacClientTests
 
     [Theory]
     [InlineData("Hmac id123:1662118565:abcdef:3ru7ibxtMinMNvfDTm9R+b86gKg7rn20DfzUOkCOgpA=:")]
-    public async Task SendAsync_HmacClient_ValidateAuthenticationHeaderExcludePayloadHash(string expected)
+    public async Task SendAsync_HmacClient_WithoutPayloadHash_SetsExpectedAuthorizationHeader(string expected)
     {
         Action<HmacSettings> configureOptions = options =>
         {
@@ -71,7 +71,7 @@ public class HmacClientTests
                 {
                     options.AppId = TestConstants.AppId;
                     options.AppKey = TestConstants.AppKey;
-                    options.TimeOffset = 0;
+                    options.TimeOffsetSeconds = 0;
                     options.TimestampCalculator = stubTimestampCalculator.Object;
                     options.NonceGenerator = stubNonceGenerator.Object;
                 });

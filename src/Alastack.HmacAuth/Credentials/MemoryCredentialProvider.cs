@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth.Credentials;
+namespace Alastack.HmacAuth.Credentials;
 
 /// <summary>
 /// The in-memory implementation of <see cref="ICredentialProvider{TCredential}"/>.
@@ -23,7 +23,7 @@ public class MemoryCredentialProvider<TCredential> : ICredentialProvider<TCreden
     }
 
     /// <inheritdoc />
-    public async Task<TCredential?> GetCredentialAsync(string id, CancellationToken token = default)
+    public async Task<TCredential?> GetCredentialAsync(string id, CancellationToken cancellationToken = default)
     {
         if (_credentialData.TryGetValue(id, out TCredential? credential))
         {

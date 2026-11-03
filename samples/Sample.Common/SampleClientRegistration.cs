@@ -23,7 +23,7 @@ public static class SampleClientRegistration
             options.AppId = SampleCredentials.AppId;
             options.AppKey = SampleCredentials.AppKey;
         });
-        services.AddSingleton<IValidateOptions<HmacSettings>, HmacConfigValidation>();
+        services.AddSingleton<IValidateOptions<HmacSettings>, HmacOptionsValidator>();
         services.AddTransient<OptionsHmacDelegatingHandler>();
         return services;
     }
@@ -39,10 +39,10 @@ public static class SampleClientRegistration
             options.AuthKey = SampleCredentials.AppKey;
             options.App = SampleCredentials.HawkApp;
             options.Dlg = SampleCredentials.HawkDlg;
-            options.EnableServerAuthorizationValidation = true;
+            options.ValidateServerAuthorization = true;
             options.GetSpecificData = (request, settings) => Task.FromResult<string?>(SampleCredentials.HawkSpecificData);
         });
-        services.AddSingleton<IValidateOptions<HawkSettings>, HawkConfigValidation>();
+        services.AddSingleton<IValidateOptions<HawkSettings>, HawkOptionsValidator>();
         services.AddTransient<OptionsHawkDelegatingHandler>();
         return services;
     }

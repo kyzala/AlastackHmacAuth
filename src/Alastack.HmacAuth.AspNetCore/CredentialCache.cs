@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Alastack.HmacAuth.AspNetCore;
@@ -30,9 +30,9 @@ public class CredentialCache<TCredential> : ICredentialCache<TCredential>
     }
 
     /// <inheritdoc />
-    public async Task<TCredential?> GetCredentialAsync(string key, CancellationToken token = default)
+    public async Task<TCredential?> GetCredentialAsync(string key, CancellationToken cancellationToken = default)
     {
-        var data = await _dataCache.GetStringAsync(key, token);
+        var data = await _dataCache.GetStringAsync(key, cancellationToken);
         if (data != null) 
         {
             return JsonSerializer.Deserialize<TCredential>(data, _options);
@@ -41,9 +41,9 @@ public class CredentialCache<TCredential> : ICredentialCache<TCredential>
     }
 
     /// <inheritdoc />
-    public async Task SetCredentialAsync(string key, TCredential credential, long cacheTime, CancellationToken token = default)
+    public async Task SetCredentialAsync(string key, TCredential credential, long cacheTime, CancellationToken cancellationToken = default)
     {
         var data = JsonSerializer.Serialize<TCredential>(credential, _options);
-        await _dataCache.SetStringAsync(key, data, TimeSpan.FromSeconds(cacheTime), token);
+        await _dataCache.SetStringAsync(key, data, TimeSpan.FromSeconds(cacheTime), cancellationToken);
     }
 }

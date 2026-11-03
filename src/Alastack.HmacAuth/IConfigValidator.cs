@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,8 +14,8 @@ public interface IConfigValidator<TConfig>
     /// Validates a specified config instance
     /// </summary>
     /// <param name="config">The config instance.</param>
-    /// <returns>ValidateConfigResult</returns>
-    ValidateConfigResult Validate(TConfig config);
+    /// <returns>ConfigValidationResult</returns>
+    ConfigValidationResult Validate(TConfig config);
 }
 
 

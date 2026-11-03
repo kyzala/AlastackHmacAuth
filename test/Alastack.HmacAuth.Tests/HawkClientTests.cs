@@ -24,10 +24,10 @@ public class HawkClientTests
     [InlineData("extdata", null, null,
         "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", hash=\"MfdKig8i5ykUIFjQkiIfmdJ0eKx5nWatljTRy2hIYkc=\", ext=\"extdata\", mac=\"kCVNXF0ki+2AcM8gf0BE3m7ShsvAghExAKjh2qMIjjc=\"")]
     [InlineData("extdata", "abc", null,
-        "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", hash=\"MfdKig8i5ykUIFjQkiIfmdJ0eKx5nWatljTRy2hIYkc=\", ext=\"extdata\", mac=\"cNX1z5hywwV4Zeoejp81APyxPGvAst8zDbjy8uiK2f4=\", app=\"abc\", dlg=\"\"")]
+        "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", hash=\"MfdKig8i5ykUIFjQkiIfmdJ0eKx5nWatljTRy2hIYkc=\", ext=\"extdata\", mac=\"cNX1z5hywwV4Zeoejp81APyxPGvAst8zDbjy8uiK2f4=\", app=\"abc\"")]
     [InlineData("extdata", "abc", "123",
         "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", hash=\"MfdKig8i5ykUIFjQkiIfmdJ0eKx5nWatljTRy2hIYkc=\", ext=\"extdata\", mac=\"O4MnqtWlnXVgS4QJNuVf2iB4XiV6uGlGIi0eU9eSrUA=\", app=\"abc\", dlg=\"123\"")]
-    public async Task SendAsync_HawkClient_ValidateAuthenticationHeaderIncludePayloadHash(string? ext, string? app, string? dlg, string expected)
+    public async Task SendAsync_HawkClient_WithPayloadHash_SetsExpectedAuthorizationHeader(string? ext, string? app, string? dlg, string expected)
     {
         Action<HawkSettings> configureOptions = options =>
         {
@@ -56,10 +56,10 @@ public class HawkClientTests
     [InlineData("extdata", null, null,
         "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", ext=\"extdata\", mac=\"jFFBjfNU18hdXCIeB/EQ+xe3ZhL0qF5ZsD+kjVMlxh0=\"")]
     [InlineData("extdata", "abc", null,
-        "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", ext=\"extdata\", mac=\"QzHSDcM4mGppdrIKF5GAF/0vqJ05EC2Jw66R4C7rldg=\", app=\"abc\", dlg=\"\"")]
+        "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", ext=\"extdata\", mac=\"QzHSDcM4mGppdrIKF5GAF/0vqJ05EC2Jw66R4C7rldg=\", app=\"abc\"")]
     [InlineData("extdata", "abc", "123",
         "Hawk id=\"id123\", ts=\"1662118565\", nonce=\"abcdef\", ext=\"extdata\", mac=\"ur1ZDiYXrFtrG80WS3WJI7Kz2aBl9egyD6ZEasQxCD8=\", app=\"abc\", dlg=\"123\"")]
-    public async Task SendAsync_HawkClient_ValidateAuthenticationHeaderExcludePayloadHash(string? ext, string? app, string? dlg, string expected)
+    public async Task SendAsync_HawkClient_WithoutPayloadHash_SetsExpectedAuthorizationHeader(string? ext, string? app, string? dlg, string expected)
     {
         Action<HawkSettings> configureOptions = options =>
         {
@@ -85,8 +85,8 @@ public class HawkClientTests
             options.IncludePayloadHash = true;
             options.App = "abc";
             options.Dlg = "123";
-            options.EnableServerAuthorizationValidation = true;
-            options.EnableServerTimeValidation = false;
+            options.ValidateServerAuthorization = true;
+            options.ValidateServerTime = false;
             options.GetSpecificData = async (request, options) => await Task.FromResult("extdata");
         };
         var httpClient = CreateClient(configureOptions);
@@ -117,8 +117,8 @@ public class HawkClientTests
             options.IncludePayloadHash = true;
             options.App = "abc";
             options.Dlg = "123";
-            options.EnableServerAuthorizationValidation = true;
-            options.EnableServerTimeValidation = false;
+            options.ValidateServerAuthorization = true;
+            options.ValidateServerTime = false;
         };
         var httpClient = CreateClient(configureOptions);
         var request = new HttpRequestMessage(HttpMethod.Put, "http://a.b.c:5000/api/data/1")
@@ -147,8 +147,8 @@ public class HawkClientTests
             options.IncludePayloadHash = true;
             options.App = "abc";
             options.Dlg = "123";
-            options.EnableServerAuthorizationValidation = false;
-            options.EnableServerTimeValidation = true;
+            options.ValidateServerAuthorization = false;
+            options.ValidateServerTime = true;
             options.GetSpecificData = async (request, options) => await Task.FromResult("extdata");
         };
         var httpClient = CreateClient(configureOptions);
@@ -171,7 +171,7 @@ public class HawkClientTests
                 {
                     options.AuthId = TestConstants.AppId;
                     options.AuthKey = TestConstants.AppKey;
-                    options.TimeOffset = 0;
+                    options.TimeOffsetSeconds = 0;
                     options.TimestampCalculator = stubTimestampCalculator.Object;
                     options.NonceGenerator = stubNonceGenerator.Object;
                 });

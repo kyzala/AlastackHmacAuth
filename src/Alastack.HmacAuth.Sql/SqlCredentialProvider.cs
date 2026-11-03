@@ -1,4 +1,4 @@
-﻿using Alastack.HmacAuth.Credentials;
+using Alastack.HmacAuth.Credentials;
 using Dapper;
 using System.Data;
 using static Dapper.SqlMapper;
@@ -37,7 +37,7 @@ public class SqlCredentialProvider<TCredential, TConnection> : ICredentialProvid
     }
 
     /// <inheritdoc />
-    public virtual async Task<TCredential?> GetCredentialAsync(string id, CancellationToken token = default)
+    public virtual async Task<TCredential?> GetCredentialAsync(string id, CancellationToken cancellationToken = default)
     {
         using var connection = new TConnection { ConnectionString = Settings.ConnectionString };
         return await connection.QueryFirstOrDefaultAsync<TCredential>(Settings.Sql, new { Id = id });

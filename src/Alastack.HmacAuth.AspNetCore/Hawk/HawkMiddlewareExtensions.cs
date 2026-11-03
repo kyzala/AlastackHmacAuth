@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 
 namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
 /// Extension methods to add Hawk authentication capabilities to an HTTP application pipeline.
 /// </summary>
-public static class HawkMiddlewareExtentions
+public static class HawkMiddlewareExtensions
 {
     /// <summary>
     /// Adds the <see cref="HawkMiddleware"/> to the specified <see cref="IApplicationBuilder"/>, which enables Hawk server authentication capabilities.

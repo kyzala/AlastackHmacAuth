@@ -14,7 +14,7 @@ public class HmacMiddlewareTests
 {
     [Theory]
     [InlineData("Hmac id123:1662118565:abcdef:SXbE34WOCepEWy1iyAUfGNWykPiX8uIQtC8b5OXewzI=:rh/Kd6geqLVo72DNrR3ua64fqvcWzdyi9XULfNybbtQ=")]
-    public async Task HandleAuthenticateAsync_HmacHandler_ValidateIncludePayloadHash(string authHeaderValue)
+    public async Task HandleAuthenticateAsync_HmacHandler_WithPayloadHash_Authenticates(string authHeaderValue)
     {
         using var host = await new HostBuilder()
             .ConfigureWebHost(ConfigureWebHost)
@@ -41,7 +41,7 @@ public class HmacMiddlewareTests
 
     [Theory]
     [InlineData("Hmac id123:1662118565:abcdef:3ru7ibxtMinMNvfDTm9R+b86gKg7rn20DfzUOkCOgpA=:")]
-    public async Task HandleAuthenticateAsync_HmacHandler_ValidateExcludePayloadHash(string authHeaderValue)
+    public async Task HandleAuthenticateAsync_HmacHandler_WithoutPayloadHash_Authenticates(string authHeaderValue)
     {
         using var host = await new HostBuilder()
             .ConfigureWebHost(ConfigureWebHost)

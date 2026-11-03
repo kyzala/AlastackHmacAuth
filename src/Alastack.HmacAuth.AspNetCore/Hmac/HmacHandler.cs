@@ -100,7 +100,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
 
         if (Options.RequireTimeSkewValidation)
         {
-            var serverTimestamp = TimeProvider.GetUtcNow().ToUnixTimeMilliseconds() + Options.TimeOffset;
+            var serverTimestamp = TimeProvider.GetUtcNow().ToUnixTimeMilliseconds() + Options.TimeOffsetMilliseconds;
             if (Math.Abs(serverTimestamp - authParams.Timestamp * 1000) > Options.TimeSkew * 1000)
             {
                 return HandleFailureAuthenticateResult("Stale timestamp.");
@@ -152,7 +152,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
     /// <returns>A task that represents the asynchronous challenge operation</returns>
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
-        if (!Options.DisableChallenge && Context.Items.TryGetValue("hawk:www-authenticate", out var wwwAuthenticate))
+        if (Options.EnableChallenge && Context.Items.TryGetValue("hawk:www-authenticate", out var wwwAuthenticate))
         {
             Response.Headers["WWW-Authenticate"] = (string)wwwAuthenticate!;
         }
@@ -182,7 +182,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
     /// <returns>An authentication failure result</returns>
     protected virtual AuthenticateResult HandleFailureAuthenticateResult(string failureMessage)
     {
-        if (!Options.DisableChallenge)
+        if (Options.EnableChallenge)
         {
             var wwwAuthenticate = $"{HmacDefaults.AuthenticationScheme} error=\"{failureMessage}\"";
             Context.Items["hawk:www-authenticate"] = wwwAuthenticate;

@@ -1,4 +1,4 @@
-﻿using Alastack.HmacAuth.Credentials;
+using Alastack.HmacAuth.Credentials;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alastack.HmacAuth.EFCore;
@@ -60,9 +60,9 @@ public class EFCoreCredentialProvider<TCredential> : ICredentialProvider<TCreden
     }
 
     /// <inheritdoc />
-    public virtual async Task<TCredential?> GetCredentialAsync(string id, CancellationToken token = default)
+    public virtual async Task<TCredential?> GetCredentialAsync(string id, CancellationToken cancellationToken = default)
     {
         using var context = new CredentialContext<TCredential>(_contextOptions, Settings.TableName, Settings.KeyName);
-        return await context.Credentials.FindAsync(id, token);
+        return await context.Credentials.FindAsync(id, cancellationToken);
     }
 }

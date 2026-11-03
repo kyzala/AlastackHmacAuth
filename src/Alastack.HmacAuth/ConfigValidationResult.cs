@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +7,7 @@ namespace Alastack.HmacAuth;
 /// <summary>
 /// Represents the result of an config validation.
 /// </summary>
-public class ValidateConfigResult
+public class ConfigValidationResult
 {
     /// <summary>
     /// Gets a value that indicates whether validation was successful.
@@ -22,7 +22,7 @@ public class ValidateConfigResult
     /// <summary>
     /// The result when validation was successful.
     /// </summary>
-    public static readonly ValidateConfigResult Success = new()
+    public static readonly ConfigValidationResult Success = new()
     {
         Succeeded = true
     };
@@ -32,9 +32,9 @@ public class ValidateConfigResult
     /// </summary>
     /// <param name="failureMessage">The reason for the failure.</param>
     /// <returns>The failure result.</returns>
-    public static ValidateConfigResult Fail(string failureMessage)
+    public static ConfigValidationResult Fail(string failureMessage)
     {
-        return new ValidateConfigResult
+        return new ConfigValidationResult
         {
             Succeeded = false,
             FailureMessage = failureMessage

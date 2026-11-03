@@ -1,4 +1,4 @@
-﻿using Alastack.HmacAuth.Credentials;
+using Alastack.HmacAuth.Credentials;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -51,12 +51,12 @@ public class MongoDBCredentialProvider<TCredential> : ICredentialProvider<TCrede
     }
 
     /// <inheritdoc />
-    public virtual async Task<TCredential?> GetCredentialAsync(string id, CancellationToken token = default)
+    public virtual async Task<TCredential?> GetCredentialAsync(string id, CancellationToken cancellationToken = default)
     {
         TCredential? credential = default;
         var collection = _database.GetCollection<BsonDocument>(Settings.CollectionName);
-        var documents = await collection.FindAsync(new BsonDocument(Settings.KeyName, id), cancellationToken: token);
-        var document = await documents.SingleOrDefaultAsync(token);
+        var documents = await collection.FindAsync(new BsonDocument(Settings.KeyName, id), cancellationToken: cancellationToken);
+        var document = await documents.SingleOrDefaultAsync(cancellationToken);
         if (document != null)
         {
             credential = BsonSerializer.Deserialize<TCredential>(document);

@@ -92,11 +92,11 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             await Options.CredentialCache.SetCredentialAsync(cacheKey, credential, Options.CredentialCacheTime);
         }
 
-        var crypto = Options.CryptoFactory.Create(credential.HmacAlgorithm, credential.HashAlgorithm, credential.AuthKey);
+        var crypto = Options.CryptoFactory.Create(credential.MacAlgorithm, credential.HashAlgorithm, credential.AuthKey);
 
         if (Options.RequireTimeSkewValidation)
         {
-            var serverTimestamp = TimeProvider.GetUtcNow().ToUnixTimeMilliseconds() + Options.TimeOffset;
+            var serverTimestamp = TimeProvider.GetUtcNow().ToUnixTimeMilliseconds() + Options.TimeOffsetMilliseconds;
             if (Math.Abs(serverTimestamp - authParams.Ts * 1000) > Options.TimeSkew * 1000)
             {
                 var ts = serverTimestamp / 1000;
@@ -168,7 +168,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
     /// <returns>A task that represents the asynchronous challenge operation</returns>
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
-        if (!Options.DisableChallenge && Context.Items.TryGetValue("hawk:www-authenticate", out var wwwAuthenticate))
+        if (Options.EnableChallenge && Context.Items.TryGetValue("hawk:www-authenticate", out var wwwAuthenticate))
         {
             Response.Headers["WWW-Authenticate"] = (string)wwwAuthenticate!;
         }
@@ -200,7 +200,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
     /// <returns>An authentication failure result</returns>
     protected virtual AuthenticateResult HandleFailureAuthenticateResult(string failureMessage, long? ts = null, string? tsm = null)
     {
-        if (!Options.DisableChallenge)
+        if (Options.EnableChallenge)
         {
             var t = ts == null ? String.Empty : $" ts=\"{ts}\", tsm=\"{tsm}\",";
             var wwwAuthenticate = $"{HawkDefaults.AuthenticationScheme}{t} error=\"{failureMessage}\"";

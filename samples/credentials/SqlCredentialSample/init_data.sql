@@ -10,7 +10,7 @@ GO
 CREATE TABLE [dbo].[HawkCredentials](
 	[AuthId] [nvarchar](32) NOT NULL,
 	[AuthKey] [nvarchar](128) NOT NULL,
-	[HmacAlgorithm] [nvarchar](32) NOT NULL,
+	[MacAlgorithm] [nvarchar](32) NOT NULL,
 	[HashAlgorithm] [nvarchar](32) NOT NULL,
 	[User] [nvarchar](32) NULL,
 	[EnableServerAuthorization] [bit] NOT NULL,
@@ -39,7 +39,7 @@ GO
 INSERT INTO [dbo].[HawkCredentials]
            ([AuthId]
            ,[AuthKey]
-           ,[HmacAlgorithm]
+           ,[MacAlgorithm]
            ,[HashAlgorithm]
            ,[User]
            ,[EnableServerAuthorization]

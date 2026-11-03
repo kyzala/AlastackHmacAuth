@@ -33,7 +33,7 @@ public class HmacSettings
     /// <summary>
     /// Set the offset(in seconds) to synchronize with the server time. Defaults to <c>0</c> second.
     /// </summary>
-    public long TimeOffset { get; set; }
+    public long TimeOffsetSeconds { get; set; }
 
     /// <summary>
     /// <see cref="ICryptoFactory"/> interface. The default implementation is <see cref="DefaultCryptoFactory"/>.

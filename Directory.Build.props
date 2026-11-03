@@ -11,7 +11,7 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageProjectUrl>https://github.com/kyzala/AlastackHmacAuth</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/kyzala/AlastackHmacAuth</RepositoryUrl>
-	<RespositoryType>git</RespositoryType>
+	<RepositoryType>git</RepositoryType>
 	<IncludeSymbols>true</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>

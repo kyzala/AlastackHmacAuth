@@ -79,7 +79,8 @@ public class HawkParameters
         {
             var hash = string.IsNullOrWhiteSpace(Hash) ? String.Empty : $"hash=\"{Hash}\", ";
             var ext = string.IsNullOrWhiteSpace(Ext) ? String.Empty : $"ext=\"{Ext}\", ";
-            var appdlg = string.IsNullOrWhiteSpace(App) ? String.Empty : $", app=\"{App}\", dlg=\"{Dlg ?? String.Empty}\"";
+            var appdlg = string.IsNullOrWhiteSpace(App) ? String.Empty
+                : string.IsNullOrWhiteSpace(Dlg) ? $", app=\"{App}\"" : $", app=\"{App}\", dlg=\"{Dlg}\"";
             return $"id=\"{Id}\", ts=\"{Ts}\", nonce=\"{Nonce}\", {hash}{ext}mac=\"{Mac}\"{appdlg}";
         }
     }

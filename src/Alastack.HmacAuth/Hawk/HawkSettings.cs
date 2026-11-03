@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth;
+namespace Alastack.HmacAuth;
 
 /// <summary>
 /// Hawk authentication settings for <see cref="HawkDelegatingHandler"/>.
@@ -16,9 +16,10 @@ public class HawkSettings
     public string AuthKey { get; set; } = default!;
 
     /// <summary>
-    /// The HMAC(Hash-based Message Authentication Code) algorithm name. Defaults to <c>HMACSHA256</c>.
+    /// The MAC algorithm name shared with the client (<c>algorithm</c> in Hawk credentials).
+    /// Defaults to <c>HMACSHA256</c>.
     /// </summary>
-    public string HmacAlgorithm { get; set; } = "HMACSHA256";
+    public string MacAlgorithm { get; set; } = "HMACSHA256";
 
     /// <summary>
     /// The hash algorithm name. Defaults to <c>SHA256</c>.
@@ -33,27 +34,28 @@ public class HawkSettings
     /// <summary>
     /// Set the offset(in seconds) to synchronize with the server time. Defaults to <c>0</c> second.
     /// </summary>
-    public long TimeOffset { get; set; }
+    public long TimeOffsetSeconds { get; set; }
 
     /// <summary>
-    /// The binding between credential and the application to prevent an attacker using credential issued to someone else.
+    /// The id of the application the credential is bound to (<c>app</c>).
     /// </summary>
     public string? App { get; set; }
 
     /// <summary>
-    /// The Id of the application the credential were issued to.
+    /// The id of the application that delegated the credential (<c>dlg</c>).
+    /// Only used together with <see cref="App"/>.
     /// </summary>
     public string? Dlg { get; set; }
 
     /// <summary>
     /// Whether to enable server-authentication validation.
     /// </summary>
-    public bool EnableServerAuthorizationValidation { get; set; }
+    public bool ValidateServerAuthorization { get; set; }
 
     /// <summary>
     /// Whether to enable server time validation.
     /// </summary>
-    public bool EnableServerTimeValidation { get; set; }
+    public bool ValidateServerTime { get; set; }
 
     /// <summary>
     /// <see cref="ICryptoFactory"/> interface. The default implementation is <see cref="DefaultCryptoFactory"/>.

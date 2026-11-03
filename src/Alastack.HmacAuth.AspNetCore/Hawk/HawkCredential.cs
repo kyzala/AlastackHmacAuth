@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth.AspNetCore;
+namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
 /// Hawk authentication credential.
@@ -16,9 +16,10 @@ public class HawkCredential
     public string AuthKey { get; set; } = default!;
 
     /// <summary>
-    /// The HMAC(Hash-based Message Authentication Code) algorithm name. Defaults to <c>HMACSHA256</c>.
+    /// The MAC algorithm name shared with the client (<c>algorithm</c> in Hawk credentials).
+    /// Defaults to <c>HMACSHA256</c>.
     /// </summary>
-    public string HmacAlgorithm { get; set; } = "HMACSHA256";
+    public string MacAlgorithm { get; set; } = "HMACSHA256";
 
     /// <summary>
     /// The hash algorithm name. Defaults to <c>SHA256</c>.

@@ -65,7 +65,7 @@ public class HawkMiddleware
         var macParameters = (HawkData)val2!;
         macParameters.Hash = null;
         macParameters.Ext = null;
-        var crypto = options.CryptoFactory.Create(credential.HmacAlgorithm, credential.HashAlgorithm, credential.AuthKey);
+        var crypto = options.CryptoFactory.Create(credential.MacAlgorithm, credential.HashAlgorithm, credential.AuthKey);
 
         if (options.IncludeResponsePayloadHash && credential.IncludeResponsePayloadHash)
         {
@@ -80,7 +80,7 @@ public class HawkMiddleware
 
         var hash = macParameters.Hash == null ? String.Empty : $", hash=\"{macParameters.Hash}\"";
         var ext = macParameters.Ext == null ? String.Empty : $", ext=\"{macParameters.Ext}\"";
-        var wwwAuthenticate = $"{HawkDefaults.AuthenticationScheme} mac=\"{mac}\"{hash}{ext}";
-        context.Response.Headers["Server-Authorization"] = wwwAuthenticate;
+        var serverAuthorization = $"{HawkDefaults.AuthenticationScheme} mac=\"{mac}\"{hash}{ext}";
+        context.Response.Headers["Server-Authorization"] = serverAuthorization;
     }
 }

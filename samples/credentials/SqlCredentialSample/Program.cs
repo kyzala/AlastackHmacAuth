@@ -11,7 +11,7 @@ builder.Services.AddAuthentication()
     options.EnableServerAuthorization = true;
     options.CredentialProvider = new SqlCredentialProvider<HawkCredential, SqlConnection>(
         builder.Configuration.GetConnectionString("CredentialDbConnection")!,
-        "SELECT AuthId,AuthKey,HmacAlgorithm,HashAlgorithm,User,EnableServerAuthorization,IncludeResponsePayloadHash FROM HawkCredentials WHERE AuthId = @Id");
+        "SELECT AuthId,AuthKey,MacAlgorithm,HashAlgorithm,User,EnableServerAuthorization,IncludeResponsePayloadHash FROM HawkCredentials WHERE AuthId = @Id");
 })
 .AddHmac(options =>
 {

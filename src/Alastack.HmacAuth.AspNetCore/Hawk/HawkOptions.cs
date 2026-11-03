@@ -23,7 +23,7 @@ public class HawkOptions : AuthenticationSchemeOptions
     /// <summary>
     /// Set the offset in milliseconds to adjust the service time. Defaults to <c>0</c> millisecond.
     /// </summary>
-    public long TimeOffset { get; set; }
+    public long TimeOffsetMilliseconds { get; set; }
 
     /// <summary>
     /// Max replay request age. Defaults to <c>60</c> seconds.
@@ -53,10 +53,10 @@ public class HawkOptions : AuthenticationSchemeOptions
     public bool IncludeResponsePayloadHash { get; set; } = true;
 
     /// <summary>
-    /// Override this method to deal with 401 challenge concerns, 
-    /// if an authentication scheme in question deals an authentication interaction as part of it's request flow.
+    /// Whether to emit a <c>WWW-Authenticate</c> challenge header on authentication failure.
+    /// Defaults to <c>false</c>.
     /// </summary>
-    public bool DisableChallenge { get; set; } = true;
+    public bool EnableChallenge { get; set; }
 
     /// <summary>
     /// <see cref="IReplayRequestValidator"/> interface. The default implementation is <see cref="Alastack.HmacAuth.AspNetCore.ReplayRequestValidator"/>.

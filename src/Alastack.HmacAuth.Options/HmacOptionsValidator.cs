@@ -1,4 +1,4 @@
-﻿using Alastack.HmacAuth;
+using Alastack.HmacAuth;
 using Microsoft.Extensions.Options;
 
 namespace Alastack.HmacAuth.Options;
@@ -6,7 +6,7 @@ namespace Alastack.HmacAuth.Options;
 /// <summary>
 /// Class used to validate <see cref="HmacSettings" /> instance.
 /// </summary>
-public class HmacConfigValidation : IValidateOptions<HmacSettings>
+public class HmacOptionsValidator : IValidateOptions<HmacSettings>
 {
     /// <summary>
     /// Validates a specific named options instance (or all when name is null).

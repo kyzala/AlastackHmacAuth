@@ -22,7 +22,7 @@ public class HawkHandlerNegativeTests
     {
         AuthId = "id123",
         AuthKey = "3@uo45er?",
-        HmacAlgorithm = "HMACSHA256",
+        MacAlgorithm = "HMACSHA256",
         HashAlgorithm = "SHA256"
     };
 
@@ -40,7 +40,7 @@ public class HawkHandlerNegativeTests
                 services.AddAuthentication(options => options.DefaultScheme = HawkDefaults.AuthenticationScheme)
                     .AddHawk(options =>
                     {
-                        options.DisableChallenge = false; // emit the WWW-Authenticate challenge header
+                        options.EnableChallenge = true; // emit the WWW-Authenticate challenge header
                         options.EnableServerAuthorization = enableServerAuthorization;
                         options.CredentialProvider = new MemoryCredentialProvider<HawkCredential>(
                             new Dictionary<string, HawkCredential> { [Credential.AuthId] = Credential });
@@ -84,7 +84,7 @@ public class HawkHandlerNegativeTests
     private static string ComputeAuthorization(long timestamp, string nonce, string? hash = null,
         string method = "GET", string resource = "/api/TodoItems/1")
     {
-        var crypto = new DefaultCryptoFactory().Create(Credential.HmacAlgorithm, Credential.HashAlgorithm, Credential.AuthKey);
+        var crypto = new DefaultCryptoFactory().Create(Credential.MacAlgorithm, Credential.HashAlgorithm, Credential.AuthKey);
         var hawkData = new HawkData
         {
             Timestamp = timestamp,

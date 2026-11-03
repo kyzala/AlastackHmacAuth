@@ -1,4 +1,4 @@
-﻿namespace Alastack.HmacAuth.AspNetCore;
+namespace Alastack.HmacAuth.AspNetCore;
 
 /// <summary>
 /// A credential cache abstraction.
@@ -10,9 +10,9 @@ public interface ICredentialCache<TCredential>
     /// Gets a credential with the given id.
     /// </summary>
     /// <param name="key">credential cache key</param>
-    /// <param name="token">Optional. A <see cref="CancellationToken" /> to cancel the operation.</param>
+    /// <param name="cancellationToken">Optional. A <see cref="CancellationToken" /> to cancel the operation.</param>
     /// <returns>The task object representing the asynchronous operation, containing the located value or null.</returns>
-    Task<TCredential?> GetCredentialAsync(string key, CancellationToken token = default);
+    Task<TCredential?> GetCredentialAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sets the credential with the given key.
@@ -20,7 +20,7 @@ public interface ICredentialCache<TCredential>
     /// <param name="key">credential cache key</param>
     /// <param name="credential">credential instance.</param>
     /// <param name="cacheTime">credential cache time.</param>
-    /// <param name="token">Optional. A <see cref="CancellationToken" /> to cancel the operation.</param>
+    /// <param name="cancellationToken">Optional. A <see cref="CancellationToken" /> to cancel the operation.</param>
     /// <returns>Task that represents the asynchronous operation.</returns>
-    Task SetCredentialAsync(string key, TCredential credential, long cacheTime, CancellationToken token = default);
+    Task SetCredentialAsync(string key, TCredential credential, long cacheTime, CancellationToken cancellationToken = default);
 }

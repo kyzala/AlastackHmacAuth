@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 
 namespace Alastack.HmacAuth;
 
@@ -74,7 +74,7 @@ public class HmacDelegatingHandler : DelegatingHandler
             payloadHash = crypto.CalculateHash(payload);
         }
 
-        var timestamp = Settings.TimestampCalculator.Calculate(Settings.TimeOffset);
+        var timestamp = Settings.TimestampCalculator.Calculate(Settings.TimeOffsetSeconds);
         var nonce = Settings.NonceGenerator.Generate(Settings.AppId);
 
         // {appId}\n{timestamp}\n{nonce}\n{method}\n{resource}\n{host}\n{port}\n{payloadHash}

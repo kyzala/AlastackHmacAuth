@@ -61,11 +61,11 @@ public class HawkDelegatingHandler : DelegatingHandler
 
         var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-        if (Settings.EnableServerAuthorizationValidation)
+        if (Settings.ValidateServerAuthorization)
         {
             await HandleServerAuthenticateAsync(response, (HawkData)authHeader.Properties["HawkData"], cancellationToken);
         }
-        if (Settings.EnableServerTimeValidation)
+        if (Settings.ValidateServerTime)
         {
             await HandleServerTimeValidateAsync(response, cancellationToken);
         }
@@ -89,14 +89,14 @@ public class HawkDelegatingHandler : DelegatingHandler
         }
 
         string? payloadHash = null;
-        var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
+        var crypto = Settings.CryptoFactory.Create(Settings.MacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
         if (request.Content != null && Settings.IncludePayloadHash)
         {
             var payload = await request.Content.ReadAsStringAsync(cancellationToken);
             payloadHash = crypto.CalculatePayloadHash(payload, request.Content.Headers.ContentType?.MediaType);
         }
 
-        var timestamp = Settings.TimestampCalculator.Calculate(Settings.TimeOffset);
+        var timestamp = Settings.TimestampCalculator.Calculate(Settings.TimeOffsetSeconds);
         var nonce = Settings.NonceGenerator.Generate(Settings.AuthId);
 
         var hawkData = new HawkData
@@ -174,7 +174,7 @@ public class HawkDelegatingHandler : DelegatingHandler
         hawkData.Hash = hash;
         hawkData.Ext = ext;
 
-        var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
+        var crypto = Settings.CryptoFactory.Create(Settings.MacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
         var macNew = crypto.CalculateResponseMac(hawkData);
         if (!FixedTimeComparer.Equals(mac, macNew))
         {
@@ -224,7 +224,7 @@ public class HawkDelegatingHandler : DelegatingHandler
         resParams.TryGetValue("tsm", out var tsm);
         if (!String.IsNullOrEmpty(ts) && !String.IsNullOrEmpty(tsm) && long.TryParse(ts, out long tsNew))
         {
-            var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
+            var crypto = Settings.CryptoFactory.Create(Settings.MacAlgorithm, Settings.HashAlgorithm, Settings.AuthKey);
             var tsmNew = crypto.CalculateTsMac(tsNew);
             if (!FixedTimeComparer.Equals(tsm, tsmNew))
             {

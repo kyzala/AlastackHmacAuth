@@ -8,7 +8,7 @@ public class CryptoFactoryTests
     [InlineData(null, null, null)]
     [InlineData("HMACSHA1", null, null)]
     [InlineData("HMACSHA1", "SHA1", null)]
-    public void Create_CryptoFactory_ThrowArgumentNullExceptionAlgorithmNames(string? hmacAlgorithmName, string? hashAlgorithmName, string? key)
+    public void Create_MissingAlgorithmName_ThrowsArgumentNullException(string? hmacAlgorithmName, string? hashAlgorithmName, string? key)
     {
         var factory = new DefaultCryptoFactory();
         Assert.Throws<ArgumentNullException>(() => factory.Create(hmacAlgorithmName!, hashAlgorithmName!, key!));
@@ -17,7 +17,7 @@ public class CryptoFactoryTests
     [Theory]
     [InlineData("EDF", "SHA1", "abc1234567890")]
     [InlineData("SHA1", "SHA1", "abc1234567890")]
-    public void Create_CryptoFactory_ThrowArgumentExceptionAlgorithmNames(string hmacAlgorithmName, string hashAlgorithmName, string key)
+    public void Create_UnsupportedAlgorithmName_ThrowsArgumentException(string hmacAlgorithmName, string hashAlgorithmName, string key)
     {
         var factory = new DefaultCryptoFactory();
         Assert.Throws<ArgumentException>(() => factory.Create(hmacAlgorithmName, hashAlgorithmName, key));
@@ -29,7 +29,7 @@ public class CryptoFactoryTests
     [InlineData("HMACSHA256", "sha256", "abc1234567890")]
     [InlineData("HmacMD5", "SHA384", "abc1234567890")]
     [InlineData("HMACSHA512", "sha1", "abc1234567890")]
-    public void Create_CryptoFactory_ValidateAlgorithmNamesSuccess(string hmacAlgorithmName, string hashAlgorithmName, string key)
+    public void Create_ValidAlgorithmNames_ReturnsCrypto(string hmacAlgorithmName, string hashAlgorithmName, string key)
     {
         var factory = new DefaultCryptoFactory();
         var crypto = factory.Create(hmacAlgorithmName, hashAlgorithmName, key);
