@@ -126,7 +126,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 Use `KnownIPNetworks` with `System.Net.IPNetwork` to trust a subnet (`KnownNetworks` is obsolete since .NET 8). Never trust arbitrary proxies while the app is reachable directly — a forged `X-Forwarded-Host` would change `Request.Host`.
 
-## Upgrading to 2.3.0
+## Upgrading to 2.3.1
 
 - Default `HashAlgorithm` changed from `MD5` to `SHA256`. Upgrade client and server together, or set `HashAlgorithm = "MD5"` explicitly.
 - `IHostResolver.Resolve` is now `Resolve(HttpRequest request)`; `ForwardIndex` was removed from `HmacOptions` and `HawkOptions`.

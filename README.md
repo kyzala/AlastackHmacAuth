@@ -1,48 +1,58 @@
-# Alastack HmacAuth
+# Alastack.HmacAuth
 
-Hmac and [Hawk](https://github.com/mozilla/hawk) authentication for .NET. Every client request is signed with a shared key, so the server can verify the caller's identity and the integrity of the request, and reject replayed traffic using a timestamp and nonce.
+Hmac and [Hawk](https://github.com/mozilla/hawk) authentication for .NET. Clients sign every request with a shared key; servers verify identity, request integrity (method, path, query, host, payload) and replay protection (timestamp + nonce).
 
-[![Build & Tests](https://img.shields.io/github/actions/workflow/status/kyzala/AlastackHmacAuth/dotnet.yml?branch=main&label=build%20%26%20tests)](https://github.com/kyzala/AlastackHmacAuth/actions/workflows/dotnet.yml)
-[![NuGet](https://img.shields.io/nuget/v/Alastack.HmacAuth)](https://www.nuget.org/packages/Alastack.HmacAuth)
-[![License](https://img.shields.io/github/license/kyzala/AlastackHmacAuth)](LICENSE)
+This README is shared by all packages in the family — install only the ones you need.
 
-## Features
-
-- **Two schemes, one model** — Hmac for a compact custom header, Hawk for the [Mozilla Hawk](https://github.com/mozilla/hawk) specification, both driven by the same credential and signing pipeline.
-- **Full request integrity** — the signature covers the HTTP method, path, query string, host, port and payload hash, so a captured request cannot be replayed against another endpoint or with a modified body.
-- **Replay protection** — timestamps are validated against an allowed clock skew and authenticated nonces are cached for a configurable window.
-- **Optional Hawk response signing** — clients can verify `Server-Authorization` and correct their clock from a `Stale timestamp` challenge.
-- **Pluggable credentials** — in-memory dictionaries plus SQL, MongoDB, LiteDB and Entity Framework Core providers, or your own `ICredentialProvider<T>`.
-- **Proxy-aware** — the original client host is recovered from `X-Forwarded-Host`, with validation of forwarded ports and IPv6 addresses.
-- **Hardened defaults** — SHA256 payload hashing and constant-time MAC comparison.
-
-## Packages
-
-- **[Alastack.HmacAuth](https://www.nuget.org/packages/Alastack.HmacAuth)** — client handlers for `HttpClient`.
-- **[Alastack.HmacAuth.AspNetCore](https://www.nuget.org/packages/Alastack.HmacAuth.AspNetCore)** — server authentication for ASP.NET Core.
-- **[Alastack.HmacAuth.Sql](https://www.nuget.org/packages/Alastack.HmacAuth.Sql)** / **[MongoDB](https://www.nuget.org/packages/Alastack.HmacAuth.MongoDB)** / **[LiteDB](https://www.nuget.org/packages/Alastack.HmacAuth.LiteDB)** / **[EFCore](https://www.nuget.org/packages/Alastack.HmacAuth.EFCore)** — credential providers.
-
-Full package documentation: [src/README.md](src/README.md).
-
-## Quick start
+- **Alastack.HmacAuth** — client `DelegatingHandler`s: `HmacDelegatingHandler`, `HawkDelegatingHandler`.
+- **Alastack.HmacAuth.AspNetCore** — server `AuthenticationHandler`s, Hawk middleware and replay protection.
+- **Alastack.HmacAuth.Sql** — `ICredentialProvider<T>` backed by any ADO.NET database (Dapper).
+- **Alastack.HmacAuth.MongoDB** — `ICredentialProvider<T>` backed by MongoDB.
+- **Alastack.HmacAuth.LiteDB** — `ICredentialProvider<T>` backed by LiteDB.
+- **Alastack.HmacAuth.EFCore** — `ICredentialProvider<T>` backed by Entity Framework Core.
 
 ```powershell
-dotnet add package Alastack.HmacAuth
-dotnet add package Alastack.HmacAuth.AspNetCore
+dotnet add package Alastack.HmacAuth            # client
+dotnet add package Alastack.HmacAuth.AspNetCore # server
 ```
 
-### Hmac
+Source, samples and issues: https://github.com/kyzala/AlastackHmacAuth
 
-**Client**
+## Client
 
 ```csharp
+using Alastack.HmacAuth;
+
 var client = new HttpClient(new HmacDelegatingHandler("appId", "appKey"))
 {
-    BaseAddress = new Uri("https://localhost:5001/")
+    BaseAddress = new Uri("https://api.example.com/")
 };
+
+var hawkClient = new HttpClient(new HawkDelegatingHandler("authId", "authKey"));
 ```
 
-**Server**
+With `IHttpClientFactory`:
+
+```csharp
+services.AddHttpClient("api", c => c.BaseAddress = new Uri("https://api.example.com/"))
+        .AddHttpMessageHandler(_ => new HmacDelegatingHandler("appId", "appKey"));
+```
+
+Hawk can also verify the server response when the server enables server authorization:
+
+```csharp
+var handler = new HawkDelegatingHandler(new HawkSettings
+{
+    AuthId = "authId",
+    AuthKey = "authKey",
+    ValidateServerAuthorization = true, // verify Server-Authorization
+    ValidateServerTime = true           // verify tsm, then adjust TimeOffsetSeconds
+});
+```
+
+The Hmac `Authorization` header is `Hmac {appId}:{timestamp}:{nonce}:{signature}:{payloadHash}`. Both handlers accept a settings object (`HmacSettings` / `HawkSettings`); the important ones are the id/key pair, `HashAlgorithm` (default `SHA256`, must match the server), `IncludePayloadHash` (default `true`) and `TimeOffsetSeconds` for a skewed clock.
+
+## Server
 
 ```csharp
 builder.Services.AddAuthentication()
@@ -51,80 +61,85 @@ builder.Services.AddAuthentication()
         options.CredentialProvider = new MemoryCredentialProvider<HmacCredential>(
             new Dictionary<string, HmacCredential>
             {
-                ["appId"] = new HmacCredential { AppId = "appId", AppKey = "appKey" }
+                ["appId1"] = new HmacCredential { AppId = "appId1", AppKey = "appKey1" }
             });
-    });
-
-var app = builder.Build();
-app.UseAuthentication();
-app.UseAuthorization();
-```
-
-Endpoints opt in with `[Authorize(AuthenticationSchemes = "Hmac")]`.
-
-### Hawk
-
-**Client**
-
-```csharp
-var client = new HttpClient(new HawkDelegatingHandler("authId", "authKey"))
-{
-    BaseAddress = new Uri("https://localhost:5001/")
-};
-```
-
-**Server**
-
-```csharp
-builder.Services.AddAuthentication()
+    })
     .AddHawk(options =>
     {
         options.CredentialProvider = new MemoryCredentialProvider<HawkCredential>(
             new Dictionary<string, HawkCredential>
             {
-                ["authId"] = new HawkCredential { AuthId = "authId", AuthKey = "authKey" }
+                ["authId1"] = new HawkCredential { AuthId = "authId1", AuthKey = "authKey1" }
             });
     });
 
 var app = builder.Build();
+
 app.UseAuthentication();
+app.UseHawkServerAuthorization(); // only for Hawk response signing; after UseAuthentication
 app.UseAuthorization();
 ```
 
-Endpoints opt in with `[Authorize(AuthenticationSchemes = "Hawk")]`. To sign responses as well, set `EnableServerAuthorization = true` in `AddHawk` and register `app.UseHawkServerAuthorization()` right after `UseAuthentication()`.
+Then protect endpoints with the scheme: `[Authorize(AuthenticationSchemes = "Hmac")]` (or `"Hawk"`).
 
-## How it works
+Replay protection is on by default: a nonce is remembered for `MaxReplayRequestAge` (60 s) and clock skew is limited to `TimeSkew` (300 s). `CredentialCacheTime` (300 s, `0` disables caching) controls credential caching, `TimeOffsetMilliseconds` corrects the server clock, and `EnableChallenge` (`false` by default) emits a `WWW-Authenticate` header on failure.
 
-The Hmac header carries the credential id, timestamp, nonce, signature and payload hash:
+## Credential stores
 
-```http
-Authorization: Hmac {appId}:{timestamp}:{nonce}:{signature}:{payloadHash}
+Assign any `ICredentialProvider<TCredential>` to `HmacOptions.CredentialProvider` / `HawkOptions.CredentialProvider`. SQL works with any `IDbConnection`, and the query must return the credential columns:
+
+```csharp
+options.CredentialProvider = new SqlCredentialProvider<HmacCredential, SqlConnection>(
+    connectionString,
+    "SELECT AppId, AppKey, HmacAlgorithm, HashAlgorithm FROM HmacCredentials WHERE AppId = @Id");
 ```
 
-On each request the server:
+```csharp
+// MongoDB: connection string, database, collection, id field
+options.CredentialProvider = new MongoDBCredentialProvider<HmacCredential>(
+    "mongodb://localhost:27017", "credentialdb", "hmac", "appId");
 
-1. resolves the credential by `appId` (or Hawk `id`) through `ICredentialProvider<T>`;
-2. rebuilds the canonical string from method, resource, host, port and payload hash, then compares the MAC in constant time;
-3. rejects timestamps outside `TimeSkew` and nonces already seen within `MaxReplayRequestAge`;
-4. optionally signs the response so the caller can verify the server as well.
+// LiteDB: file connection string, collection, id field
+options.CredentialProvider = new LiteDBCredentialProvider<HmacCredential>(
+    "Filename=Data\\hmac.db;Password=1234", "hmac", "appId");
 
-Hawk additionally supports `ext`, `mac`, `tsm` and a `Stale timestamp` challenge for clock correction.
+// EF Core: reuse your DbContext options, then the table and key column
+var builder = new DbContextOptionsBuilder<CredentialContext<HmacCredential>>();
+builder.UseSqlServer(connectionString);
+options.CredentialProvider = new EFCoreCredentialProvider<HmacCredential>(builder, "HmacCredentials", "AppId");
+```
+
+The storage-specific providers also expose helpers such as `InitDatabase()` and `AddCredential()` for seeding.
 
 ## Behind a reverse proxy
 
-Host and port are part of the signature, so the server must see the host the client signed. `DefaultHostResolver` reads the leftmost `X-Forwarded-Host` entry automatically — no extra middleware is required. If other application code depends on `Request.Host`/`Request.Scheme`, register `UseForwardedHeaders` and restrict trust with `KnownProxies` or `KnownIPNetworks`; never accept forwarded headers from arbitrary clients while the app is directly reachable.
+The host and port are part of the signature. `DefaultHostResolver` reads the **leftmost** `X-Forwarded-Host` entry, so the original client host is used even through multiple proxies; if other code needs `Request.Host`/`Request.Scheme`, register the middleware and trust only your proxies:
+
+```csharp
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 5,
+    KnownProxies = { IPAddress.Parse("192.168.1.102"), IPAddress.Parse("192.168.1.103") }
+});
+```
+
+Use `KnownIPNetworks` with `System.Net.IPNetwork` to trust a subnet (`KnownNetworks` is obsolete since .NET 8). Never trust arbitrary proxies while the app is reachable directly — a forged `X-Forwarded-Host` would change `Request.Host`.
+
+## Upgrading to 2.3.1
+
+- Default `HashAlgorithm` changed from `MD5` to `SHA256`. Upgrade client and server together, or set `HashAlgorithm = "MD5"` explicitly.
+- `IHostResolver.Resolve` is now `Resolve(HttpRequest request)`; `ForwardIndex` was removed from `HmacOptions` and `HawkOptions`.
+- MAC/signature comparisons are now constant-time.
+- Renamed for consistency: `DataCacheExtentions` → `DataCacheExtensions`, `HawkMiddlewareExtentions` → `HawkMiddlewareExtensions`, `ValidateConfigResult` → `ConfigValidationResult`, and `HmacConfigValidation` / `HawkConfigValidation` → `HmacOptionsValidator` / `HawkOptionsValidator`.
+- `TimeOffset` is split into `TimeOffsetSeconds` (client settings) and `TimeOffsetMilliseconds` (server options).
+- `DisableChallenge` became `EnableChallenge` (default `false`, so behavior is unchanged).
+- Client flags `EnableServerAuthorizationValidation` / `EnableServerTimeValidation` became `ValidateServerAuthorization` / `ValidateServerTime`.
+- `HawkCredential.HmacAlgorithm` and `HawkSettings.HmacAlgorithm` became `MacAlgorithm`, matching Hawk's `algorithm` field. Rename the matching column/field in your credential store, or alias it in the query (`SELECT ..., HmacAlgorithm AS MacAlgorithm ...`).
+- `CancellationToken` parameters named `token` are now `cancellationToken`.
 
 ## Samples
 
-Runnable examples in [samples](https://github.com/kyzala/AlastackHmacAuth/tree/main/samples):
+Runnable examples for clients, servers, every credential store and a YARP proxy topology:
+https://github.com/kyzala/AlastackHmacAuth/tree/main/samples
 
-- `ApiHostSample` — ASP.NET Core host for both schemes, with a `/debug-forwarded` endpoint for inspecting forwarding headers.
-- `ApiProxy` — YARP proxy used to verify host resolution behind reverse proxies.
-- `ClientBasicSample`, `ClientHostSample` — plain `HttpClient` and `IHttpClientFactory` clients with interactive menus.
-- `SqlCredentialSample`, `MongoDBCredentialSample`, `LiteDBCredentialSample`, `EFCoreCredentialSample` — one host per credential store.
-
-Start `ApiHostSample` first, then run a client sample and pick a scheme and operation from the menu.
-
-## Getting help
-
-Use [GitHub Issues](https://github.com/kyzala/AlastackHmacAuth/issues) for bug reports and questions. The unit tests in `test/` are the reference for current behavior.
