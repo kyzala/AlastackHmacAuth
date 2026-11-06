@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{83478E57-3E5A-4D7A-971E-32F277BCE5F8}"
 	ProjectSection(SolutionItems) = preProject
 		src\Directory.Packages.props = src\Directory.Packages.props
+		src\README.md = src\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{5F9B417E-A221-4CC7-A22B-AE8A4A54599C}"
