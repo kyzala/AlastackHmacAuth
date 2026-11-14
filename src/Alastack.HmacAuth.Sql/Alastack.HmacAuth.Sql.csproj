@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Alastack.HmacAuth\Alastack.HmacAuth.csproj" />
   </ItemGroup>
 
