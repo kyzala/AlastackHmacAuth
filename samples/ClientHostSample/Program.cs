@@ -1,4 +1,4 @@
-using Alastack.HmacAuth.Options;
+using Alastack.HmacAuth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sample.Common;
@@ -66,11 +66,11 @@ internal class Program
                 });
                 if (useHmac)
                 {
-                    httpClientBuilder.AddHttpMessageHandler<OptionsHmacDelegatingHandler>();
+                    httpClientBuilder.AddHttpMessageHandler<HmacOptionsDelegatingHandler>();
                 }
                 else
                 {
-                    httpClientBuilder.AddHttpMessageHandler<OptionsHawkDelegatingHandler>();
+                    httpClientBuilder.AddHttpMessageHandler<HawkOptionsDelegatingHandler>();
                 }
             })
             .Build();

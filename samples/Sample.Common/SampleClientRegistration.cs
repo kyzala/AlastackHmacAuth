@@ -1,5 +1,4 @@
 using Alastack.HmacAuth;
-using Alastack.HmacAuth.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -12,9 +11,9 @@ namespace Sample.Common;
 public static class SampleClientRegistration
 {
     /// <summary>
-    /// Registers <see cref="HmacSettings"/>, validation and <see cref="OptionsHmacDelegatingHandler"/>.
+    /// Registers <see cref="HmacSettings"/>, validation and <see cref="HmacOptionsDelegatingHandler"/>.
     /// The returned handler must still be attached to an HttpClient via
-    /// <c>AddHttpMessageHandler&lt;InjectableHmacDelegatingHandler&gt;()</c>.
+    /// <c>AddHttpMessageHandler&lt;HmacOptionsDelegatingHandler&gt;()</c>.
     /// </summary>
     public static IServiceCollection AddSampleHmacAuth(this IServiceCollection services)
     {
@@ -24,12 +23,12 @@ public static class SampleClientRegistration
             options.AppSecret = SampleCredentials.AppSecret;
         });
         services.AddSingleton<IValidateOptions<HmacSettings>, HmacOptionsValidator>();
-        services.AddTransient<OptionsHmacDelegatingHandler>();
+        services.AddTransient<HmacOptionsDelegatingHandler>();
         return services;
     }
 
     /// <summary>
-    /// Registers <see cref="HawkSettings"/>, validation and <see cref="OptionsHawkDelegatingHandler"/>.
+    /// Registers <see cref="HawkSettings"/>, validation and <see cref="HawkOptionsDelegatingHandler"/>.
     /// </summary>
     public static IServiceCollection AddSampleHawkAuth(this IServiceCollection services)
     {
@@ -43,7 +42,7 @@ public static class SampleClientRegistration
             options.GetSpecificData = (request, settings) => Task.FromResult<string?>(SampleCredentials.HawkSpecificData);
         });
         services.AddSingleton<IValidateOptions<HawkSettings>, HawkOptionsValidator>();
-        services.AddTransient<OptionsHawkDelegatingHandler>();
+        services.AddTransient<HawkOptionsDelegatingHandler>();
         return services;
     }
 }

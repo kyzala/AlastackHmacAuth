@@ -21,9 +21,9 @@ public class HawkConfigValidator : IConfigValidator<HawkSettings>
         {
             validationMessage += $"{nameof(options.MacAlgorithm)} must not be null or whitespace.";
         }
-        if (String.IsNullOrWhiteSpace(options.MacAlgorithm))
+        if (String.IsNullOrWhiteSpace(options.HashAlgorithm))
         {
-            validationMessage += $"{nameof(options.MacAlgorithm)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.HashAlgorithm)} must not be null or whitespace.";
         }
 
         if (validationMessage != null)

@@ -1,7 +1,6 @@
-using Alastack.HmacAuth;
 using Microsoft.Extensions.Options;
 
-namespace Alastack.HmacAuth.Options;
+namespace Alastack.HmacAuth;
 
 /// <summary>
 /// Class used to validate <see cref="HmacSettings" /> instance.
@@ -20,7 +19,6 @@ public class HmacOptionsValidator : IValidateOptions<HmacSettings>
         if (result.Succeeded)
         {
             return ValidateOptionsResult.Success;
-
         }
         return ValidateOptionsResult.Fail(result.FailureMessage!);
     }

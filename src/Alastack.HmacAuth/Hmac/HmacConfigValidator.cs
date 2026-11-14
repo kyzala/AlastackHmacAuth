@@ -21,9 +21,9 @@ public class HmacConfigValidator : IConfigValidator<HmacSettings>
         {
             validationMessage += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
         }
-        if (String.IsNullOrWhiteSpace(options.HmacAlgorithm))
+        if (String.IsNullOrWhiteSpace(options.HashAlgorithm))
         {
-            validationMessage += $"{nameof(options.HmacAlgorithm)} must not be null or whitespace.";
+            validationMessage += $"{nameof(options.HashAlgorithm)} must not be null or whitespace.";
         }
 
         if (validationMessage != null)

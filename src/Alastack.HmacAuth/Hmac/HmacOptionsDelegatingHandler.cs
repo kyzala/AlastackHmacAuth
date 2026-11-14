@@ -1,16 +1,12 @@
-﻿using Alastack.HmacAuth;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Extensions.Options;
 
-namespace Alastack.HmacAuth.Options;
+namespace Alastack.HmacAuth;
 
 /// <summary>
 /// The <see cref="HmacDelegatingHandler"/> implementation that supplies its settings from
 /// <see cref="IOptionsMonitor{T}"/>, so configuration changes are picked up at runtime.
 /// </summary>
-public class OptionsHmacDelegatingHandler : HmacDelegatingHandler
+public class HmacOptionsDelegatingHandler : HmacDelegatingHandler
 {
     private readonly IOptionsMonitor<HmacSettings> _optionsMonitor;
 
@@ -18,10 +14,10 @@ public class OptionsHmacDelegatingHandler : HmacDelegatingHandler
     public override HmacSettings Settings => _optionsMonitor.CurrentValue;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="OptionsHmacDelegatingHandler"/>.
+    /// Initializes a new instance of <see cref="HmacOptionsDelegatingHandler"/>.
     /// </summary>
     /// <param name="optionsMonitor">Used for notifications when <see cref="HmacSettings"/> instances change.</param>
-    public OptionsHmacDelegatingHandler(IOptionsMonitor<HmacSettings> optionsMonitor)
+    public HmacOptionsDelegatingHandler(IOptionsMonitor<HmacSettings> optionsMonitor)
     {
         _optionsMonitor = optionsMonitor;
     }
