@@ -21,7 +21,7 @@ public class HmacHandlerNegativeTests
     private static readonly HmacCredential Credential = new()
     {
         AppId = "id123",
-        AppKey = "3@uo45er?",
+        AppSecret = "3@uo45er?",
         HmacAlgorithm = "HMACSHA256",
         HashAlgorithm = "SHA256"
     };
@@ -78,7 +78,7 @@ public class HmacHandlerNegativeTests
     private static string ComputeAuthorization(string appId, long timestamp, string nonce, string payloadHash,
         string method = "GET", string resource = "/api/TodoItems/1")
     {
-        var crypto = new DefaultCryptoFactory().Create(Credential.HmacAlgorithm, Credential.HashAlgorithm, Credential.AppKey);
+        var crypto = new DefaultCryptoFactory().Create(Credential.HmacAlgorithm, Credential.HashAlgorithm, Credential.AppSecret);
         var macNormalize = $"{appId}\n{timestamp}\n{nonce}\n{method}\n{resource}\nexample.com\n80\n{payloadHash}";
         var signature = crypto.CalculateMac(macNormalize);
         // wire format: Hmac {appId}:{timestamp}:{nonce}:{signature}:{payloadHash}

@@ -89,14 +89,14 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
         {
             // Get credential from provider.
             credential = await Options.CredentialProvider.GetCredentialAsync(authParams.AppId);
-            if (credential == null || credential.AppKey == null)
+            if (credential == null || credential.AppSecret == null)
             {
                 return HandleFailureAuthenticateResult("Invalid credential.");
             }
             await Options.CredentialCache.SetCredentialAsync(cacheKey, credential, Options.CredentialCacheTime);
         }
 
-        var crypto = Options.CryptoFactory.Create(credential.HmacAlgorithm, credential.HashAlgorithm, credential.AppKey);
+        var crypto = Options.CryptoFactory.Create(credential.HmacAlgorithm, credential.HashAlgorithm, credential.AppSecret);
 
         if (Options.RequireTimeSkewValidation)
         {

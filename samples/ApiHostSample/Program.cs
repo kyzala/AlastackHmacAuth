@@ -15,7 +15,7 @@ public class Program
     public static void Main(string[] args)
     {
         string appId = "id123";
-        string appKey = "3@uo45er?";
+        string appSecret = "3@uo45er?";
 
         var builder = WebApplication.CreateBuilder(args);
 
@@ -55,7 +55,7 @@ public class Program
             var credential = new HawkCredential
             {
                 AuthId = appId,
-                AuthKey = appKey,
+                AuthKey = appSecret,
                 EnableServerAuthorization = true,
                 IncludeResponsePayloadHash = true,
             };
@@ -69,7 +69,7 @@ public class Program
             var credential = new HmacCredential
             {
                 AppId = appId,
-                AppKey = appKey
+                AppSecret = appSecret
             };
             var dict = new Dictionary<string, HmacCredential> { { appId, credential } };
             options.CredentialProvider = new MemoryCredentialProvider<HmacCredential>(dict);

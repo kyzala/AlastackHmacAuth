@@ -7,13 +7,13 @@ using Sample.Common;
 await ConsoleMenu.RunAsync("ClientBasicSample (raw HttpClient)", new ConsoleMenu.Item[]
 {
     new("Hmac - GET /WeatherForecast",
-        () => GetWeatherForecastAsync(new HmacDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppKey))),
+        () => GetWeatherForecastAsync(new HmacDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppSecret))),
     new("Hawk - GET /WeatherForecast",
-        () => GetWeatherForecastAsync(new HawkDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppKey))),
+        () => GetWeatherForecastAsync(new HawkDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppSecret))),
     new("Hmac - concurrency burst (20 parallel GETs)",
-        () => WeatherForecastBurstAsync(new HmacDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppKey))),
+        () => WeatherForecastBurstAsync(new HmacDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppSecret))),
     new("Hawk - concurrency burst (20 parallel GETs)",
-        () => WeatherForecastBurstAsync(new HawkDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppKey))),
+        () => WeatherForecastBurstAsync(new HawkDelegatingHandler(SampleCredentials.AppId, SampleCredentials.AppSecret))),
 });
 
 static HttpClient CreateClient(DelegatingHandler authHandler)

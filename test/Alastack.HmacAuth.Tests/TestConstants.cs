@@ -7,5 +7,5 @@ namespace Alastack.HmacAuth.Tests;
 internal static class TestConstants
 {
     public const string AppId = "id123";
-    public const string AppKey = "3@uo45er?";
+    public const string AppSecret = "3@uo45er?";
 }

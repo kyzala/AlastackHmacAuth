@@ -11,9 +11,9 @@ public class HmacCredential
     public string AppId { get; set; } = default!;
 
     /// <summary>
-    /// The app key.
+    /// The app secret used as the shared key for signing.
     /// </summary>
-    public string AppKey { get; set; } = default!;
+    public string AppSecret { get; set; } = default!;
 
     /// <summary>
     /// The HMAC(Hash-based Message Authentication Code) algorithm name. Defaults to <c>HMACSHA256</c>.

@@ -81,7 +81,7 @@ public class HmacMiddlewareTests
                     var credential = new HmacCredential
                     {
                         AppId = TestConstants.AppId,
-                        AppKey = TestConstants.AppKey
+                        AppSecret = TestConstants.AppSecret
                     };
                     options.RequireTimeSkewValidation = false;
                     var dict = new Dictionary<string, HmacCredential> { { TestConstants.AppId, credential } };

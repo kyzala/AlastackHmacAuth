@@ -17,7 +17,7 @@ builder.Services.AddAuthentication()
 {
     options.CredentialProvider = new SqlCredentialProvider<HmacCredential, SqlConnection>(
         builder.Configuration.GetConnectionString("CredentialDbConnection")!,
-        "SELECT AppId,AppKey,HmacAlgorithm,HashAlgorithm FROM HmacCredentials WHERE AppId = @Id");
+        "SELECT AppId,AppSecret,HmacAlgorithm,HashAlgorithm FROM HmacCredentials WHERE AppId = @Id");
 });
 
 var app = builder.Build();

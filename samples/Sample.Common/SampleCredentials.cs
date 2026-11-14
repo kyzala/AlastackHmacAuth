@@ -7,7 +7,7 @@ namespace Sample.Common;
 public static class SampleCredentials
 {
     public const string AppId = "id123";
-    public const string AppKey = "3@uo45er?";
+    public const string AppSecret = "3@uo45er?";
 
     public const string HawkApp = "app1234";
     public const string HawkDlg = "dlg1234";

@@ -170,7 +170,7 @@ public class HawkClientTests
                 services.Configure<HawkSettings>(options =>
                 {
                     options.AuthId = TestConstants.AppId;
-                    options.AuthKey = TestConstants.AppKey;
+                    options.AuthKey = TestConstants.AppSecret;
                     options.TimeOffsetSeconds = 0;
                     options.TimestampCalculator = stubTimestampCalculator.Object;
                     options.NonceGenerator = stubNonceGenerator.Object;

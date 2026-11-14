@@ -25,7 +25,7 @@ GO
 
 CREATE TABLE [dbo].[HmacCredentials](
 	[AppId] [nvarchar](32) NOT NULL,
-	[AppKey] [nvarchar](128) NOT NULL,
+	[AppSecret] [nvarchar](128) NOT NULL,
 	[HmacAlgorithm] [nvarchar](32) NOT NULL,
 	[HashAlgorithm] [nvarchar](32) NOT NULL,
 	[CreatedTime] [datetime] NOT NULL,
@@ -58,7 +58,7 @@ GO
 
 INSERT INTO [dbo].[HmacCredentials]
            ([AppId]
-           ,[AppKey]
+           ,[AppSecret]
            ,[HmacAlgorithm]
            ,[HashAlgorithm]
            ,[CreatedTime])

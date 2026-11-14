@@ -24,7 +24,7 @@ db.hawk.createIndex({authId: 1}, {unique: true})
 db.hmac.insert(
     {
         'appId': 'id123',
-        'appKey': '3@uo45er?',
+        'appSecret': '3@uo45er?',
         'hmacAlgorithm': 'HMACSHA256',
         'hashAlgorithm': 'SHA256',
         'createdTime': new Date('2022-11-05T01:00:00Z')

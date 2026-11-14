@@ -23,8 +23,8 @@ public class HmacDelegatingHandler : DelegatingHandler
     /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
     /// </summary>
     /// <param name="appId">The app Id.</param>
-    /// <param name="appKey">The app key.</param>
-    public HmacDelegatingHandler(string appId, string appKey) : this(new HmacSettings { AppId = appId, AppKey = appKey })
+    /// <param name="appSecret">The app secret.</param>
+    public HmacDelegatingHandler(string appId, string appSecret) : this(new HmacSettings { AppId = appId, AppSecret = appSecret })
     {
     }
 
@@ -67,7 +67,7 @@ public class HmacDelegatingHandler : DelegatingHandler
         }
 
         string payloadHash = String.Empty;
-        var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AppKey);
+        var crypto = Settings.CryptoFactory.Create(Settings.HmacAlgorithm, Settings.HashAlgorithm, Settings.AppSecret);
         if (request.Content != null && Settings.IncludePayloadHash)
         {
             var payload = await request.Content.ReadAsStringAsync(cancellationToken);

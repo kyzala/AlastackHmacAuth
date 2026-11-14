@@ -21,7 +21,7 @@ public static class SampleClientRegistration
         services.Configure<HmacSettings>(options =>
         {
             options.AppId = SampleCredentials.AppId;
-            options.AppKey = SampleCredentials.AppKey;
+            options.AppSecret = SampleCredentials.AppSecret;
         });
         services.AddSingleton<IValidateOptions<HmacSettings>, HmacOptionsValidator>();
         services.AddTransient<OptionsHmacDelegatingHandler>();
@@ -36,7 +36,7 @@ public static class SampleClientRegistration
         services.Configure<HawkSettings>(options =>
         {
             options.AuthId = SampleCredentials.AppId;
-            options.AuthKey = SampleCredentials.AppKey;
+            options.AuthKey = SampleCredentials.AppSecret;
             options.App = SampleCredentials.HawkApp;
             options.Dlg = SampleCredentials.HawkDlg;
             options.ValidateServerAuthorization = true;

@@ -70,7 +70,7 @@ public class HmacClientTests
                 services.Configure<HmacSettings>(options =>
                 {
                     options.AppId = TestConstants.AppId;
-                    options.AppKey = TestConstants.AppKey;
+                    options.AppSecret = TestConstants.AppSecret;
                     options.TimeOffsetSeconds = 0;
                     options.TimestampCalculator = stubTimestampCalculator.Object;
                     options.NonceGenerator = stubNonceGenerator.Object;

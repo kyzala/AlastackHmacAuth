@@ -123,7 +123,7 @@ public class HawkMiddlewareTests
                     var credential = new HawkCredential
                     {
                         AuthId = TestConstants.AppId,
-                        AuthKey = TestConstants.AppKey,
+                        AuthKey = TestConstants.AppSecret,
                         EnableServerAuthorization = enableServerAuthorization,
                         IncludeResponsePayloadHash = includeResponsePayloadHash
                     };
