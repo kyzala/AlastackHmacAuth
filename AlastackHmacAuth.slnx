@@ -1,0 +1,36 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/ApiHostSample/ApiHostSample.csproj" />
+    <Project Path="samples/ApiProxy/ApiProxy.csproj" />
+    <Project Path="samples/ClientBasicSample/ClientBasicSample.csproj" />
+    <Project Path="samples/ClientHostSample/ClientHostSample.csproj" />
+    <Project Path="samples/ClientRefitSample/ClientRefitSample.csproj" />
+    <Project Path="samples/Sample.Common/Sample.Common.csproj" />
+  </Folder>
+  <Folder Name="/samples/credentials/">
+    <Project Path="samples/credentials/EFCoreCredentialSample/EFCoreCredentialSample.csproj" />
+    <Project Path="samples/credentials/LiteDBCredentialSample/LiteDBCredentialSample.csproj" />
+    <Project Path="samples/credentials/MongoDBCredentialSample/MongoDBCredentialSample.csproj" />
+    <Project Path="samples/credentials/SqlCredentialSample/SqlCredentialSample.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Packages.props" />
+    <File Path="src/README.md" />
+    <Project Path="src/Alastack.HmacAuth.AspNetCore/Alastack.HmacAuth.AspNetCore.csproj" />
+    <Project Path="src/Alastack.HmacAuth.Options/Alastack.HmacAuth.Options.csproj" />
+    <Project Path="src/Alastack.HmacAuth/Alastack.HmacAuth.csproj" />
+  </Folder>
+  <Folder Name="/src/credentials/">
+    <Project Path="src/Alastack.HmacAuth.EFCore/Alastack.HmacAuth.EFCore.csproj" />
+    <Project Path="src/Alastack.HmacAuth.LiteDB/Alastack.HmacAuth.LiteDB.csproj" />
+    <Project Path="src/Alastack.HmacAuth.MongoDB/Alastack.HmacAuth.MongoDB.csproj" />
+    <Project Path="src/Alastack.HmacAuth.Sql/Alastack.HmacAuth.Sql.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Alastack.HmacAuth.Tests/Alastack.HmacAuth.Tests.csproj" />
+  </Folder>
+</Solution>
