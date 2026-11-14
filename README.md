@@ -4,7 +4,7 @@ Hmac and [Hawk](https://github.com/mozilla/hawk) authentication for .NET. Client
 
 - **Alastack.HmacAuth** — client `DelegatingHandler`s: `HmacDelegatingHandler`, `HawkDelegatingHandler`.
 - **Alastack.HmacAuth.AspNetCore** — server `AuthenticationHandler`s, Hawk middleware and replay protection.
-- **Alastack.HmacAuth.Sql** — `ICredentialProvider<T>` backed by any ADO.NET database (Dapper).
+- **Alastack.HmacAuth.Sql** — `ICredentialProvider<T>` backed by any ADO.NET database.
 - **Alastack.HmacAuth.MongoDB** — `ICredentialProvider<T>` backed by MongoDB.
 - **Alastack.HmacAuth.LiteDB** — `ICredentialProvider<T>` backed by LiteDB.
 - **Alastack.HmacAuth.EFCore** — `ICredentialProvider<T>` backed by Entity Framework Core.
@@ -19,7 +19,7 @@ dotnet add package Alastack.HmacAuth.AspNetCore # server
 ```csharp
 using Alastack.HmacAuth;
 
-var client = new HttpClient(new HmacDelegatingHandler("appId", "appKey"))
+var client = new HttpClient(new HmacDelegatingHandler("appId", "appSecret"))
 {
     BaseAddress = new Uri("https://api.example.com/")
 };
@@ -31,7 +31,7 @@ With `IHttpClientFactory`:
 
 ```csharp
 services.AddHttpClient("api", c => c.BaseAddress = new Uri("https://api.example.com/"))
-        .AddHttpMessageHandler(_ => new HmacDelegatingHandler("appId", "appKey"));
+        .AddHttpMessageHandler(_ => new HmacDelegatingHandler("appId", "appSecret"));
 ```
 
 Hawk can also verify the server response when the server enables server authorization:
@@ -57,7 +57,7 @@ builder.Services.AddAuthentication()
         options.CredentialProvider = new MemoryCredentialProvider<HmacCredential>(
             new Dictionary<string, HmacCredential>
             {
-                ["appId1"] = new HmacCredential { AppId = "appId1", AppKey = "appKey1" }
+                ["appId1"] = new HmacCredential { AppId = "appId1", AppSecret = "appSecret1" }
             });
     })
     .AddHawk(options =>
@@ -87,7 +87,7 @@ Assign any `ICredentialProvider<TCredential>` to `HmacOptions.CredentialProvider
 ```csharp
 options.CredentialProvider = new SqlCredentialProvider<HmacCredential, SqlConnection>(
     connectionString,
-    "SELECT AppId, AppKey, HmacAlgorithm, HashAlgorithm FROM HmacCredentials WHERE AppId = @Id");
+    "SELECT AppId, AppSecret, HmacAlgorithm, HashAlgorithm FROM HmacCredentials WHERE AppId = @Id");
 ```
 
 ```csharp
