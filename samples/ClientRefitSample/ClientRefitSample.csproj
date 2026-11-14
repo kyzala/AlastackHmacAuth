@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Alastack.HmacAuth.Options\Alastack.HmacAuth.Options.csproj" />
+    <ProjectReference Include="..\..\src\Alastack.HmacAuth\Alastack.HmacAuth.csproj" />
     <ProjectReference Include="..\Sample.Common\Sample.Common.csproj" />
   </ItemGroup>
 
