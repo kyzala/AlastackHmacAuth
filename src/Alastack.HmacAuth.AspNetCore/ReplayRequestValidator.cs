@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Alastack.HmacAuth.AspNetCore;
 
@@ -9,7 +10,7 @@ public class ReplayRequestValidator : IReplayRequestValidator
 {
     private readonly IDataCache _dataCache;
 
-    private readonly ILogger? _logger;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Initializes a new instance of <see cref="ReplayRequestValidator"/>.
@@ -19,7 +20,7 @@ public class ReplayRequestValidator : IReplayRequestValidator
     public ReplayRequestValidator(IDataCache dataCache, ILogger? logger = null)
     {
         _dataCache = dataCache;
-        _logger = logger;
+        _logger = logger ?? NullLogger.Instance;
     }
 
     /// <inheritdoc />
@@ -32,7 +33,7 @@ public class ReplayRequestValidator : IReplayRequestValidator
         var val = await _dataCache.GetAsync(id, cancellationToken);
         if (val != null)
         {
-            _logger?.LogWarning("Replay request detected. Key={Key} Nonce={Nonce} Timestamp={Timestamp}", id, nonce, timestamp);
+            ServerLogMessages.ReplayRequestDetected(_logger, id, nonce, timestamp);
             return true;
         }
         //var data = Encoding.UTF8.GetBytes(timestamp.ToString());

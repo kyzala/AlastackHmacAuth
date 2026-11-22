@@ -45,13 +45,13 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
     {
         if (!Request.Headers.TryGetValue("Authorization", out var authorization))
         {
-            Logger.LogInformation("Hawk authentication failed: missing Authorization header. Path={Path}", Request.Path);
+            ServerLogMessages.MissingAuthorizationHeader(Logger, HawkDefaults.AuthenticationScheme, Request.Path);
             return HandleFailureAuthenticateResult("Missing Authorization header.");
         }
         var authorHeaderValue = authorization.First();
         if (authorHeaderValue is null || !authorHeaderValue.StartsWith(HawkDefaults.AuthenticationScheme))
         {
-            Logger.LogInformation("Hawk authentication failed: invalid authorization scheme. Path={Path}", Request.Path);
+            ServerLogMessages.InvalidAuthorizationScheme(Logger, HawkDefaults.AuthenticationScheme, Request.Path);
             return HandleFailureAuthenticateResult("Invalid authorization scheme.");
         }
 
@@ -63,7 +63,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Invalid authorization parameters.");
+            ServerLogMessages.InvalidAuthorizationParameters(Logger, ex, HawkDefaults.AuthenticationScheme, Request.Path);
             return HandleFailureAuthenticateResult("Invalid authorization parameters.");
         }
         if (Options.MaxReplayRequestAge > 0 && Options.ReplayRequestValidator != null)
@@ -72,7 +72,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             var result = await Options.ReplayRequestValidator.ValidateAsync(nonceKey, authParams.Nonce, authParams.Ts, Options.MaxReplayRequestAge);
             if (result)
             {
-                Logger.LogWarning("Hawk authentication rejected: replay request. Id={Id} Nonce={Nonce}", authParams.Id, authParams.Nonce);
+                ServerLogMessages.ReplayRequestRejected(Logger, HawkDefaults.AuthenticationScheme, authParams.Id, authParams.Nonce);
                 return HandleFailureAuthenticateResult("Replay request.");
             }
         }
@@ -93,12 +93,12 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Hawk credential provider failed. Id={Id}", authParams.Id);
+                ServerLogMessages.CredentialProviderFailed(Logger, ex, HawkDefaults.AuthenticationScheme, authParams.Id);
                 throw;
             }
             if (credential == null || credential.AuthKey == null)
             {
-                Logger.LogWarning("Hawk authentication failed: credential not found or has no key. Id={Id}", authParams.Id);
+                ServerLogMessages.CredentialNotFound(Logger, HawkDefaults.AuthenticationScheme, authParams.Id);
                 return HandleFailureAuthenticateResult("Invalid credential.");
             }
             await Options.CredentialCache.SetCredentialAsync(cacheKey, credential, Options.CredentialCacheTime);
@@ -112,7 +112,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
             if (Math.Abs(serverTimestamp - authParams.Ts * 1000) > Options.TimeSkew * 1000)
             {
                 var ts = serverTimestamp / 1000;
-                Logger.LogInformation("Hawk authentication failed: stale timestamp. Id={Id} ClientTimestamp={ClientTimestamp} ServerTimestamp={ServerTimestamp} TimeSkew={TimeSkew}", authParams.Id, authParams.Ts, ts, Options.TimeSkew);
+                ServerLogMessages.StaleTimestamp(Logger, HawkDefaults.AuthenticationScheme, authParams.Id, authParams.Ts, ts, Options.TimeSkew);
                 var tsm = crypto.CalculateTsMac(ts);
                 return HandleFailureAuthenticateResult("Stale timestamp.", ts, tsm);
             }
@@ -136,7 +136,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
         var mac = crypto.CalculateRequestMac(hawkData);
         if (!FixedTimeComparer.Equals(authParams.Mac, mac))
         {
-            Logger.LogWarning("Hawk authentication failed: bad MAC. Id={Id} Path={Path}", authParams.Id, Request.Path);
+            ServerLogMessages.BadMac(Logger, HawkDefaults.AuthenticationScheme, authParams.Id, Request.Path);
             return HandleFailureAuthenticateResult("Bad mac.");
         }
 
@@ -151,7 +151,7 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
                 var payloadHash = crypto.CalculatePayloadHash(payload, contentType);
                 if (!FixedTimeComparer.Equals(authParams.Hash, payloadHash))
                 {
-                    Logger.LogWarning("Hawk authentication failed: bad payload hash. Id={Id} Path={Path}", authParams.Id, Request.Path);
+                    ServerLogMessages.BadPayloadHash(Logger, HawkDefaults.AuthenticationScheme, authParams.Id, Request.Path);
                     return HandleFailureAuthenticateResult("Bad payload hash.");
                 }
             }

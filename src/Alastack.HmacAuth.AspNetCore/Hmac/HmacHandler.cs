@@ -45,13 +45,13 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
     {
         if (!Request.Headers.TryGetValue("Authorization", out var authorization))
         {
-            Logger.LogInformation("Hmac authentication failed: missing Authorization header. Path={Path}", Request.Path);
+            ServerLogMessages.MissingAuthorizationHeader(Logger, HmacDefaults.AuthenticationScheme, Request.Path);
             return HandleFailureAuthenticateResult("Missing Authorization header.");
         }
         var authorHeaderValue = authorization.First();
         if (authorHeaderValue is null || !authorHeaderValue.StartsWith(HmacDefaults.AuthenticationScheme))
         {
-            Logger.LogInformation("Hmac authentication failed: invalid authorization scheme. Path={Path}", Request.Path);
+            ServerLogMessages.InvalidAuthorizationScheme(Logger, HmacDefaults.AuthenticationScheme, Request.Path);
             return HandleFailureAuthenticateResult("Invalid authorization scheme.");
         }
 
@@ -61,14 +61,14 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
             var rawParams = Options.AuthorizationParameterExtractor.Extract(authorHeaderValue);
             if (rawParams.Count != 6)
             {
-                Logger.LogInformation("Hmac authentication failed: expected 6 authorization parameters but found {Count}. Path={Path}", rawParams.Count, Request.Path);
+                ServerLogMessages.UnexpectedParameterCount(Logger, 6, rawParams.Count, HmacDefaults.AuthenticationScheme, Request.Path);
                 return HandleFailureAuthenticateResult("Error authorization parameters.");
             }
             authParams = HmacParameters.Parse(rawParams);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Invalid authorization parameters.");
+            ServerLogMessages.InvalidAuthorizationParameters(Logger, ex, HmacDefaults.AuthenticationScheme, Request.Path);
             return HandleFailureAuthenticateResult("Invalid authorization parameters.");
         }
         if (Options.MaxReplayRequestAge > 0)
@@ -77,7 +77,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
             var result = await Options.ReplayRequestValidator.ValidateAsync(nonceKey, authParams.Nonce, authParams.Timestamp, Options.MaxReplayRequestAge);
             if (result)
             {
-                Logger.LogWarning("Hmac authentication rejected: replay request. AppId={AppId} Nonce={Nonce}", authParams.AppId, authParams.Nonce);
+                ServerLogMessages.ReplayRequestRejected(Logger, HmacDefaults.AuthenticationScheme, authParams.AppId, authParams.Nonce);
                 return HandleFailureAuthenticateResult("Replay request.");
             }
         }
@@ -98,12 +98,12 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Hmac credential provider failed. AppId={AppId}", authParams.AppId);
+                ServerLogMessages.CredentialProviderFailed(Logger, ex, HmacDefaults.AuthenticationScheme, authParams.AppId);
                 throw;
             }
             if (credential == null || credential.AppSecret == null)
             {
-                Logger.LogWarning("Hmac authentication failed: credential not found or has no secret. AppId={AppId}", authParams.AppId);
+                ServerLogMessages.CredentialNotFound(Logger, HmacDefaults.AuthenticationScheme, authParams.AppId);
                 return HandleFailureAuthenticateResult("Invalid credential.");
             }
             await Options.CredentialCache.SetCredentialAsync(cacheKey, credential, Options.CredentialCacheTime);
@@ -116,7 +116,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
             var serverTimestamp = TimeProvider.GetUtcNow().ToUnixTimeMilliseconds() + Options.TimeOffsetMilliseconds;
             if (Math.Abs(serverTimestamp - authParams.Timestamp * 1000) > Options.TimeSkew * 1000)
             {
-                Logger.LogInformation("Hmac authentication failed: stale timestamp. AppId={AppId} ClientTimestamp={ClientTimestamp} ServerTimestamp={ServerTimestamp} TimeSkew={TimeSkew}", authParams.AppId, authParams.Timestamp, serverTimestamp / 1000, Options.TimeSkew);
+                ServerLogMessages.StaleTimestamp(Logger, HmacDefaults.AuthenticationScheme, authParams.AppId, authParams.Timestamp, serverTimestamp / 1000, Options.TimeSkew);
                 return HandleFailureAuthenticateResult("Stale timestamp.");
             }
         }
@@ -129,7 +129,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
         var signature = crypto.CalculateMac(hmacData);
         if (!FixedTimeComparer.Equals(authParams.Signature, signature))
         {
-            Logger.LogWarning("Hmac authentication failed: bad MAC. AppId={AppId} Path={Path}", authParams.AppId, Request.Path);
+            ServerLogMessages.BadMac(Logger, HmacDefaults.AuthenticationScheme, authParams.AppId, Request.Path);
             return HandleFailureAuthenticateResult("Bad mac.");
         }
 
@@ -143,7 +143,7 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
                 var payloadHash = crypto.CalculateHash(payload);
                 if (!FixedTimeComparer.Equals(authParams.PayloadHash, payloadHash))
                 {
-                    Logger.LogWarning("Hmac authentication failed: bad payload hash. AppId={AppId} Path={Path}", authParams.AppId, Request.Path);
+                    ServerLogMessages.BadPayloadHash(Logger, HmacDefaults.AuthenticationScheme, authParams.AppId, Request.Path);
                     return HandleFailureAuthenticateResult("Bad payload hash.");
                 }
             }

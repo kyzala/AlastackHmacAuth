@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Alastack.HmacAuth;
 
@@ -10,7 +11,7 @@ public class HmacDelegatingHandler : DelegatingHandler
 {
     private readonly HmacSettings? _hmacSettings;
 
-    private readonly ILogger? _logger;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Hmac authentication settings.
@@ -20,7 +21,10 @@ public class HmacDelegatingHandler : DelegatingHandler
     /// <summary>
     /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
     /// </summary>
-    protected HmacDelegatingHandler() { }
+    protected HmacDelegatingHandler()
+    {
+        _logger = NullLogger.Instance;
+    }
 
     /// <summary>
     /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
@@ -28,7 +32,7 @@ public class HmacDelegatingHandler : DelegatingHandler
     /// <param name="logger">The optional logger.</param>
     protected HmacDelegatingHandler(ILogger? logger)
     {
-        _logger = logger;
+        _logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>
@@ -48,7 +52,7 @@ public class HmacDelegatingHandler : DelegatingHandler
     public HmacDelegatingHandler(HmacSettings hmacSettings, ILogger<HmacDelegatingHandler>? logger = null)
     {
         _hmacSettings = hmacSettings;
-        _logger = logger;
+        _logger = (ILogger?)logger ?? NullLogger.Instance;
     }
 
     /// <inheritdoc />
@@ -96,8 +100,7 @@ public class HmacDelegatingHandler : DelegatingHandler
         var signature = crypto.CalculateMac(hmacData);
         var parameter = $"{Settings.AppId}:{timestamp}:{nonce}:{signature}:{payloadHash}";
 
-        _logger?.LogDebug("Hmac request signed. AppId={AppId} Method={Method} Uri={Uri} Timestamp={Timestamp}",
-            Settings.AppId, request.Method.Method, request.RequestUri, timestamp);
+        ClientLogMessages.HmacRequestSigned(_logger, Settings.AppId, request.Method.Method, request.RequestUri, timestamp);
 
         return new AuthenticationHeader
         {

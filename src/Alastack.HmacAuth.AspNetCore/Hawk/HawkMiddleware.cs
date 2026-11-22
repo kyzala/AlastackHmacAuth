@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace Alastack.HmacAuth.AspNetCore;
@@ -11,7 +12,7 @@ public class HawkMiddleware
 {
     private readonly RequestDelegate _next;
 
-    private readonly ILogger? _logger;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Initializes a new instance of <see cref="HawkMiddleware"/>.
@@ -22,7 +23,7 @@ public class HawkMiddleware
     public HawkMiddleware(RequestDelegate next, ILogger<HawkMiddleware>? logger = null)
     {
         _next = next ?? throw new ArgumentNullException(nameof(next));
-        _logger = logger;
+        _logger = (ILogger?)logger ?? NullLogger.Instance;
     }
     /// <summary>
     /// Invokes the middleware performing authentication.
@@ -51,7 +52,7 @@ public class HawkMiddleware
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to add Hawk server authorization. Path={Path}", context.Request.Path);
+                ServerLogMessages.ServerAuthorizationFailed(_logger, ex, context.Request.Path);
                 throw;
             }
             finally
@@ -92,6 +93,6 @@ public class HawkMiddleware
         var ext = macParameters.Ext == null ? String.Empty : $", ext=\"{macParameters.Ext}\"";
         var serverAuthorization = $"{HawkDefaults.AuthenticationScheme} mac=\"{mac}\"{hash}{ext}";
         context.Response.Headers["Server-Authorization"] = serverAuthorization;
-        _logger?.LogDebug("Hawk Server-Authorization added. Id={Id} Path={Path}", credential.AuthId, context.Request.Path);
+        ServerLogMessages.ServerAuthorizationAdded(_logger, credential.AuthId, context.Request.Path);
     }
 }
