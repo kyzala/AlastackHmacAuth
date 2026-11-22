@@ -87,7 +87,15 @@ public class HawkHandler : AuthenticationHandler<HawkOptions>
         if (credential == null)
         {
             // Get credential from provider.
-            credential = await Options.CredentialProvider.GetCredentialAsync(authParams.Id);
+            try
+            {
+                credential = await Options.CredentialProvider.GetCredentialAsync(authParams.Id);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Hawk credential provider failed. Id={Id}", authParams.Id);
+                throw;
+            }
             if (credential == null || credential.AuthKey == null)
             {
                 Logger.LogWarning("Hawk authentication failed: credential not found or has no key. Id={Id}", authParams.Id);

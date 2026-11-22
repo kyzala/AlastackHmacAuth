@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace Alastack.HmacAuth.AspNetCore;
 
@@ -10,6 +11,8 @@ namespace Alastack.HmacAuth.AspNetCore;
 public class CredentialCache<TCredential> : ICredentialCache<TCredential>
 {
     private readonly IDataCache _dataCache;
+
+    private readonly ILogger? _logger;
 
     private readonly JsonSerializerOptions _options = new()
     {
@@ -24,9 +27,11 @@ public class CredentialCache<TCredential> : ICredentialCache<TCredential>
     /// Initializes a new instance of <see cref="CredentialCache{TCredential}"/>.
     /// </summary>
     /// <param name="dataCache"><see cref="IDataCache"/></param>
-    public CredentialCache(IDataCache dataCache) 
+    /// <param name="logger">The optional logger.</param>
+    public CredentialCache(IDataCache dataCache, ILogger? logger = null) 
     {            
         _dataCache = dataCache;
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -35,8 +40,10 @@ public class CredentialCache<TCredential> : ICredentialCache<TCredential>
         var data = await _dataCache.GetStringAsync(key, cancellationToken);
         if (data != null) 
         {
+            _logger?.LogDebug("Credential cache hit. Key={Key}", key);
             return JsonSerializer.Deserialize<TCredential>(data, _options);
         }
+        _logger?.LogDebug("Credential cache miss. Key={Key}", key);
         return default;
     }
 
@@ -45,5 +52,6 @@ public class CredentialCache<TCredential> : ICredentialCache<TCredential>
     {
         var data = JsonSerializer.Serialize<TCredential>(credential, _options);
         await _dataCache.SetStringAsync(key, data, TimeSpan.FromSeconds(cacheTime), cancellationToken);
+        _logger?.LogDebug("Credential cached. Key={Key} CacheTime={CacheTime}s", key, cacheTime);
     }
 }

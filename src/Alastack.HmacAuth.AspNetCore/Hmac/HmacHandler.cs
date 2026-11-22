@@ -92,7 +92,15 @@ public class HmacHandler : AuthenticationHandler<HmacOptions>
         if (credential == null)
         {
             // Get credential from provider.
-            credential = await Options.CredentialProvider.GetCredentialAsync(authParams.AppId);
+            try
+            {
+                credential = await Options.CredentialProvider.GetCredentialAsync(authParams.AppId);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Hmac credential provider failed. AppId={AppId}", authParams.AppId);
+                throw;
+            }
             if (credential == null || credential.AppSecret == null)
             {
                 Logger.LogWarning("Hmac authentication failed: credential not found or has no secret. AppId={AppId}", authParams.AppId);

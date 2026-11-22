@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Alastack.HmacAuth.AspNetCore;
 
@@ -9,13 +10,17 @@ public class HmacPostConfigureOptions : IPostConfigureOptions<HmacOptions>
 {
     private readonly IDataCache _dataCache;
 
+    private readonly ILoggerFactory? _loggerFactory;
+
     /// <summary>
     /// Initializes the <see cref="HmacPostConfigureOptions"/>.
     /// </summary>
     /// <param name="dataCache">The <see cref="IDataCache"/>.</param>
-    public HmacPostConfigureOptions(IDataCache dataCache)
+    /// <param name="loggerFactory">The optional logger factory used by the default cache and replay validator.</param>
+    public HmacPostConfigureOptions(IDataCache dataCache, ILoggerFactory? loggerFactory = null)
     {
         _dataCache = dataCache;
+        _loggerFactory = loggerFactory;
     }
 
     /// <summary>
@@ -25,8 +30,8 @@ public class HmacPostConfigureOptions : IPostConfigureOptions<HmacOptions>
     /// <param name="options">The <see cref="HmacOptions"/> instance to configure.</param>
     public void PostConfigure(string? name, HmacOptions options)
     {
-        options.ReplayRequestValidator ??= new ReplayRequestValidator(_dataCache);
-        options.CredentialCache ??= new CredentialCache<HmacCredential>(_dataCache);
+        options.ReplayRequestValidator ??= new ReplayRequestValidator(_dataCache, _loggerFactory?.CreateLogger<ReplayRequestValidator>());
+        options.CredentialCache ??= new CredentialCache<HmacCredential>(_dataCache, _loggerFactory?.CreateLogger<CredentialCache<HmacCredential>>());
         options.CryptoFactory ??= new DefaultCryptoFactory();
         options.AuthorizationParameterExtractor ??= new HmacParameterExtractor();
         options.HostResolver ??= new DefaultHostResolver();
