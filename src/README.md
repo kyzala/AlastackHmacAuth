@@ -9,6 +9,8 @@ Hmac and [Hawk](https://github.com/mozilla/hawk) authentication for .NET. Client
 - **Alastack.HmacAuth.LiteDB** — `ICredentialProvider<T>` backed by LiteDB.
 - **Alastack.HmacAuth.EFCore** — `ICredentialProvider<T>` backed by Entity Framework Core.
 
+Targets .NET 8, .NET 10 and .NET 11.
+
 ```powershell
 dotnet add package Alastack.HmacAuth            # client
 dotnet add package Alastack.HmacAuth.AspNetCore # server
