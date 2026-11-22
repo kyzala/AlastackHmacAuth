@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using Microsoft.Extensions.Logging;
 
 namespace Alastack.HmacAuth;
 
@@ -8,6 +9,8 @@ namespace Alastack.HmacAuth;
 public class HmacDelegatingHandler : DelegatingHandler
 {
     private readonly HmacSettings? _hmacSettings;
+
+    private readonly ILogger? _logger;
 
     /// <summary>
     /// Hmac authentication settings.
@@ -22,6 +25,15 @@ public class HmacDelegatingHandler : DelegatingHandler
     /// <summary>
     /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
     /// </summary>
+    /// <param name="logger">The optional logger.</param>
+    protected HmacDelegatingHandler(ILogger? logger)
+    {
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
+    /// </summary>
     /// <param name="appId">The app Id.</param>
     /// <param name="appSecret">The app secret.</param>
     public HmacDelegatingHandler(string appId, string appSecret) : this(new HmacSettings { AppId = appId, AppSecret = appSecret })
@@ -32,9 +44,11 @@ public class HmacDelegatingHandler : DelegatingHandler
     /// Initializes a new instance of <see cref="HmacDelegatingHandler"/>.
     /// </summary>
     /// <param name="hmacSettings">The <see cref="HmacSettings"/>.</param>
-    public HmacDelegatingHandler(HmacSettings hmacSettings)
+    /// <param name="logger">The optional logger.</param>
+    public HmacDelegatingHandler(HmacSettings hmacSettings, ILogger<HmacDelegatingHandler>? logger = null)
     {
         _hmacSettings = hmacSettings;
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -81,6 +95,9 @@ public class HmacDelegatingHandler : DelegatingHandler
         var hmacData = $"{Settings.AppId}\n{timestamp}\n{nonce}\n{request.Method.Method}\n{request.RequestUri.PathAndQuery}\n{request.RequestUri.Host}\n{request.RequestUri.Port}\n{payloadHash}";
         var signature = crypto.CalculateMac(hmacData);
         var parameter = $"{Settings.AppId}:{timestamp}:{nonce}:{signature}:{payloadHash}";
+
+        _logger?.LogDebug("Hmac request signed. AppId={AppId} Method={Method} Uri={Uri} Timestamp={Timestamp}",
+            Settings.AppId, request.Method.Method, request.RequestUri, timestamp);
 
         return new AuthenticationHeader
         {

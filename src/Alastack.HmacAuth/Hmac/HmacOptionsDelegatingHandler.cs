@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Alastack.HmacAuth;
 
@@ -17,7 +18,8 @@ public class HmacOptionsDelegatingHandler : HmacDelegatingHandler
     /// Initializes a new instance of <see cref="HmacOptionsDelegatingHandler"/>.
     /// </summary>
     /// <param name="optionsMonitor">Used for notifications when <see cref="HmacSettings"/> instances change.</param>
-    public HmacOptionsDelegatingHandler(IOptionsMonitor<HmacSettings> optionsMonitor)
+    /// <param name="logger">The optional logger.</param>
+    public HmacOptionsDelegatingHandler(IOptionsMonitor<HmacSettings> optionsMonitor, ILogger<HmacOptionsDelegatingHandler>? logger = null) : base(logger)
     {
         _optionsMonitor = optionsMonitor;
     }

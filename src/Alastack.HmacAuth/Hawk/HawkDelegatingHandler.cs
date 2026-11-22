@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using Microsoft.Extensions.Logging;
 
 namespace Alastack.HmacAuth;
 
@@ -10,6 +11,8 @@ public class HawkDelegatingHandler : DelegatingHandler
 {
     private readonly HawkSettings? _hawkSettings;
 
+    private readonly ILogger? _logger;
+
     /// <summary>
     /// Gets the Hawk authentication settings
     /// </summary>
@@ -19,6 +22,15 @@ public class HawkDelegatingHandler : DelegatingHandler
     /// Initializes a new instance of the <see cref="HawkDelegatingHandler"/> class
     /// </summary>
     protected HawkDelegatingHandler() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HawkDelegatingHandler"/> class
+    /// </summary>
+    /// <param name="logger">The optional logger</param>
+    protected HawkDelegatingHandler(ILogger? logger)
+    {
+        _logger = logger;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HawkDelegatingHandler"/> class
@@ -34,9 +46,11 @@ public class HawkDelegatingHandler : DelegatingHandler
     /// with Hawk settings
     /// </summary>
     /// <param name="hawkSettings">The Hawk authentication settings</param>
-    public HawkDelegatingHandler(HawkSettings hawkSettings)
+    /// <param name="logger">The optional logger</param>
+    public HawkDelegatingHandler(HawkSettings hawkSettings, ILogger<HawkDelegatingHandler>? logger = null)
     {
         _hawkSettings = hawkSettings;
+        _logger = logger;
     }
 
     /// <summary>
@@ -132,6 +146,10 @@ public class HawkDelegatingHandler : DelegatingHandler
             Parameter = authVal.Parameter
         };
         header.Properties["HawkData"] = hawkData;
+
+        _logger?.LogDebug("Hawk request signed. Id={Id} Method={Method} Uri={Uri} Timestamp={Timestamp} App={App} Dlg={Dlg}",
+            Settings.AuthId, request.Method.Method, request.RequestUri, timestamp, hawkData.App, hawkData.Dlg);
+
         return header;
     }
 
@@ -160,11 +178,14 @@ public class HawkDelegatingHandler : DelegatingHandler
         var saParams = Settings.AuthorizationParameterExtractor.Extract(authorization);
         if (saParams.Count > 4) // sheme, mac, hash, ext
         {
+            _logger?.LogWarning("Hawk server authorization validation failed: unexpected parameter count {Count}. Uri={Uri}",
+                saParams.Count, response.RequestMessage?.RequestUri);
             response.StatusCode = HttpStatusCode.Unauthorized;
             return;
         }
         if (!saParams.TryGetValue("mac", out var mac))
         {
+            _logger?.LogWarning("Hawk server authorization validation failed: missing mac. Uri={Uri}", response.RequestMessage?.RequestUri);
             response.StatusCode = HttpStatusCode.Unauthorized;
             return;
         }
@@ -178,6 +199,7 @@ public class HawkDelegatingHandler : DelegatingHandler
         var macNew = crypto.CalculateResponseMac(hawkData);
         if (!FixedTimeComparer.Equals(mac, macNew))
         {
+            _logger?.LogWarning("Hawk server authorization validation failed: bad mac. Uri={Uri}", response.RequestMessage?.RequestUri);
             response.StatusCode = HttpStatusCode.Unauthorized;
             return;
         }
@@ -187,6 +209,7 @@ public class HawkDelegatingHandler : DelegatingHandler
             var payloadHash = crypto.CalculatePayloadHash(payload, response.Content.Headers.ContentType?.MediaType);
             if (!FixedTimeComparer.Equals(hawkData.Hash, payloadHash))
             {
+                _logger?.LogWarning("Hawk server authorization validation failed: bad payload hash. Uri={Uri}", response.RequestMessage?.RequestUri);
                 response.StatusCode = HttpStatusCode.Unauthorized;
                 return;
             }
@@ -228,6 +251,8 @@ public class HawkDelegatingHandler : DelegatingHandler
             var tsmNew = crypto.CalculateTsMac(tsNew);
             if (!FixedTimeComparer.Equals(tsm, tsmNew))
             {
+                _logger?.LogWarning("Hawk server timestamp validation failed. ServerTimestamp={ServerTimestamp} CurrentOffsetSeconds={Offset}",
+                    tsNew, Settings.TimeOffsetSeconds);
                 throw new HawkTimestampException("Invalid server timestamp hash", tsNew);
             }
         }

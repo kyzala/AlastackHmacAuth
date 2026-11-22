@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Alastack.HmacAuth;
 
@@ -17,7 +18,8 @@ public class HawkOptionsDelegatingHandler : HawkDelegatingHandler
     /// Initializes a new instance of <see cref="HawkOptionsDelegatingHandler"/>.
     /// </summary>
     /// <param name="optionsMonitor">Used for notifications when <see cref="HawkSettings"/> instances change.</param>
-    public HawkOptionsDelegatingHandler(IOptionsMonitor<HawkSettings> optionsMonitor)
+    /// <param name="logger">The optional logger.</param>
+    public HawkOptionsDelegatingHandler(IOptionsMonitor<HawkSettings> optionsMonitor, ILogger<HawkOptionsDelegatingHandler>? logger = null) : base(logger)
     {
         _optionsMonitor = optionsMonitor;
     }
